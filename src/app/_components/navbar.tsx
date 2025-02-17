@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 
 export default async function NavBar() {
     return(
@@ -7,9 +8,9 @@ export default async function NavBar() {
                 <div className="flex flex-auto relative place-items-center min-w-400">
                     <div className="flex place-items-center min-w-60">
                         <div className="justify-items-center w-10">
-                            <a className="mr2 flex flex-none relative circle focus-visible-current-color border-darken3 w-6 h-6" href="/">
+                            <Link className="mr2 flex flex-none relative circle focus-visible-current-color border-darken3 w-6 h-6" href="/">
                                 <Image src="/airtable-navbar-icon.PNG" alt="Airtable Navbar Icon" width={24} height={24} />
-                            </a>
+                            </Link>
                         </div>
                         <button aria-label="Open base settings menu" className="flex place-items-center flex-auto max-w-480">
                             <div className="flex place-items-center huge pointer line-height-3 focus-visible-current-color rounded css-w1u7fo lightColoredBase min-w-0 flex-initial">
@@ -25,24 +26,24 @@ export default async function NavBar() {
                     <nav className="mx2 flex place-items-center">
                         <ul className="flex place-items-center list-none m-4">
                             <li>
-                                <a className="flex-inline justify-items-center place-items-center px-3 list-item rounded-full bg-green-300" href='/'>
+                                <Link className="flex-inline justify-items-center place-items-center px-3 list-item rounded-full bg-green-300" href='/'>
                                     <p className="font-family-default text-size-default line-height-4 font-weight-default">Data</p>
-                                </a>
+                                </Link>
                             </li>
                             <li>
-                                <a className="flex-inline justify-items-center place-items-center px-3 list-item rounded-full bg-green-300" href='/'>
+                                <Link className="flex-inline justify-items-center place-items-center px-3 list-item rounded-full bg-green-300" href='/'>
                                     <p className="font-family-default text-size-default line-height-4 font-weight-default">Automations</p>
-                                </a>
+                                </Link>
                             </li>
                             <li>
-                                <a className="flex-inline justify-items-center place-items-center px-3 list-item rounded-full bg-green-300" href='/'>
+                                <Link className="flex-inline justify-items-center place-items-center px-3 list-item rounded-full bg-green-300" href='/'>
                                     <p className="font-family-default text-size-default line-height-4 font-weight-default">Interfaces</p>
-                                </a>
+                                </Link>
                             </li>
                             <li>
-                                <a className="flex-inline justify-items-center place-items-center px-3 list-item rounded-full bg-green-300" href='/'>
+                                <Link className="flex-inline justify-items-center place-items-center px-3 list-item rounded-full bg-green-300" href='/'>
                                     <p className="font-family-default text-size-default line-height-4 font-weight-default">Forms</p>
-                                </a>
+                                </Link>
                             </li>
                         </ul>
                     </nav>
