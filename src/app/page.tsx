@@ -1,24 +1,23 @@
-// import Link from "next/link";
-
-// import { LatestPost } from "~/app/_components/post";
 import { auth } from "~/server/auth";
 import { api, HydrateClient } from "~/trpc/server";
 import HomePage from "./pages/homepage";
+import LoginPage from "./login/page";
+import { redirect } from "next/navigation"; // Import redirect
 
 export default async function Home() {
-  // const hello = await api.post.hello({ text: "from tRPC" });
   const session = await auth();
 
-
-  if (session?.user) {
-    void api.post.getLatest.prefetch();
+  // If no session, redirect to the login page
+  if (!session?.user) {
+    redirect("/login");
   }
 
-  
+  // Prefetch data if user is authenticated
+  void api.post.getLatest.prefetch();
 
   return (
     <HydrateClient>
-      <HomePage></HomePage>
+      <HomePage />
     </HydrateClient>
   );
 }

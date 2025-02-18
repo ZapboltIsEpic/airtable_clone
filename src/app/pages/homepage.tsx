@@ -1,6 +1,6 @@
-import HomeMainContent from "../_components/homemaincontent";
-import HomeNavBar from "../_components/homenavbar";
-import HomeSideBar from "../_components/homesidebar";
+import HomeMainContent from "../_components/home/homemaincontent";
+import HomeNavBar from "../_components/home/homenavbar";
+import HomeSideBar from "../_components/home/homesidebar";
 
 export default function HomePage() {
     return (

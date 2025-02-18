@@ -1,5 +1,5 @@
 import Image from "next/image"
-import TableCreationWayFlexBox from "./tablecreationwayflexbox"
+import TableCreationWayFlexBox from "../tablecreationwayflexbox"
 
 export default async function HomeMainContent() {
     return (
