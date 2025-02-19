@@ -1,7 +1,8 @@
 "use client";
 
-import { signIn } from "next-auth/react";
+import { supabase } from "~/app/utils/supabase";
 import { useState } from "react";
+import { redirect } from "next/navigation";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -10,14 +11,27 @@ export default function LoginPage() {
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    const result = await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
+  
+    const { error } = await supabase.auth.signInWithPassword({
+      email: email,
+      password: password,
     });
-
-    if (result?.error) {
+  
+    if (error) {
+      console.error("Error signing in:", error);
       alert("Invalid credentials");
+    } 
+    else {
+      console.log("Signed in successfully!");
+
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (session) {
+        console.log("Session is now available!");
+        redirect("/home");  
+      } else {
+        console.error("No session found after sign-in");
+      }
     }
   };
 
@@ -31,6 +45,9 @@ export default function LoginPage() {
         password: formData.get('password'),
       })
     })
+    if (!response.ok) {
+      alert("error occurred");
+    }
     console.log({response});
   }
 
@@ -56,8 +73,8 @@ export default function LoginPage() {
               className="border p-2"
             />
             <button type="submit" className="bg-blue-500 text-white p-2">Login</button>
-            <button className="bg-green-500 text-white p-2" onClick={() => setSignInState(false)}>Sign Up</button>
           </form>
+          <button className="mt-5 justify-center items-center bg-green-500 text-white p-2" onClick={() => setSignInState(false)}>Sign Up</button>
         </div>
       ) : (
         <div>

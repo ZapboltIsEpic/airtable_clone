@@ -65,4 +65,7 @@ export const authConfig = {
       },
     }),
   },
-} satisfies NextAuthConfig;
+  session: {
+    strategy: "database", // This is optional but helps make it clear that you want to store sessions in the database.
+  },
+}

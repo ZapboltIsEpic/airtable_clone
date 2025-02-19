@@ -1,7 +1,8 @@
+import { redirect } from "next/navigation";
 import Image from "next/image"
 import Link from "next/link"
 
-export default async function HomeNavBar() {
+export default function HomeNavBar() {
     return (
         <div>
             <header className="flex place-items-center w-full colors-background-default flex-none shadow-elevation-low h-14 z-20">
@@ -36,7 +37,7 @@ export default async function HomeNavBar() {
                                     <Image src="/bell-svgrepo-com.svg" alt="?" width={16} height={16} />
                                 </button>
                             </div>
-                            <button>
+                            <button onClick={() => redirect("./login")}>
                                 <Image src="/user-icon" alt="Y" width={28} height={28} />
                             </button>
                         </div>

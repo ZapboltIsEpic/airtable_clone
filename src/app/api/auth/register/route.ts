@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { hash } from 'bcrypt';
 import { supabase } from "~/app/utils/supabase";
 
 export async function POST(request: Request) {
@@ -8,17 +7,17 @@ export async function POST(request: Request) {
         const { email, password } = body;
         console.log({email, password});
 
-        // const hashedPassword = await hash(password, 10);
-        const { data: dbData, error: dbError } = await supabase
-            .from("airtable-clone.users")
-            .insert([{ email, password }]);
+        const { data, error } = await supabase.auth.signUp({
+            email: email,
+            password: password,
+        })
 
-        if (dbError) {
-            console.error("Database insert error:", dbError.message);
-            return NextResponse.json({ error: dbError.message }, { status: 500 });
+        if (error) {
+            console.error("Database insert error:", error.message);
+            return NextResponse.json({ error: error.message }, { status: 500 });
         }
 
-        console.log("User stored in DB:", dbData);
+        console.log("User stored in DB:", data);
     }
     catch (e) {
         console.log({ e });

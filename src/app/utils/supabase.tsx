@@ -7,4 +7,14 @@ if (!supabaseUrl || !supabaseKey) {
   throw new Error("Missing Supabase URL or Key");
 }
 
-export const supabase = createClient(supabaseUrl, supabaseKey);
+const isBrowser = typeof window !== "undefined";
+
+export const supabase = createClient(supabaseUrl, supabaseKey, {
+  auth: isBrowser ? {
+    storage: window.localStorage,
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: false,
+  }
+  : undefined,
+});
