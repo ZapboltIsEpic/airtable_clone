@@ -3,6 +3,19 @@ import Image from "next/image"
 import Link from "next/link"
 
 export default function HomeNavBar() {
+    const session = localStorage.getItem('sb-xasktggrrutkhavrsexk-auth-token');
+    
+    // If no session, redirect to the login page
+    if (!session) {
+        console.log("session", session)
+        redirect("/login");
+    }
+
+    // session.user.id
+    // const { data, error } = await supabase
+    //     .from('bases')
+    //     .select()
+
     return (
         <div>
             <header className="flex place-items-center w-full colors-background-default flex-none shadow-elevation-low h-14 z-20">

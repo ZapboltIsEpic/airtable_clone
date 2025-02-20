@@ -1,7 +1,19 @@
+'use client';
+
+import { useEffect, useState } from "react";
+import { api } from "~/trpc/react";
 import Image from "next/image"
 import TableCreationWayFlexBox from "../tablecreationwayflexbox"
+import BaseListItem from "./baselistitem";
 
-export default async function HomeMainContent() {
+export default function HomeMainContent({ session }: { session: Session }) {
+    const { data: bases, isLoading, error } = api.base.get.useQuery(
+        { userId: session?.user?.id ?? "" }, 
+        { enabled: !!session?.user?.id } 
+    );
+    console.log(bases);
+
+
     return (
         <div className="bg-gray-100 overflow-auto w-full flex flex-col">
             <div className="pt-8 px-12 flex-auto">
@@ -81,6 +93,26 @@ export default async function HomeMainContent() {
                             <div className="flex flex-col justify-center mb-4 w-full">
                                 <div className="text-left">
                                     <p>Name</p>
+                                </div>
+                            </div>
+                            <div className="flex flex-col w-full items-start mb-6">
+                                <h4>Today</h4>
+                                <div className="flex items-center w-full">
+                                    { isLoading ? (
+                                        <p>Loading...</p>
+                                    ) : error ? (
+                                        <p>Error getting bases</p>
+                                    ) : (
+                                        <>
+                                            {bases && bases.length > 0 ? (
+                                                bases.map((base) => (
+                                                    <BaseListItem key={base.id} base={base} />
+                                                ))
+                                            ) : (
+                                                <p>No bases available</p>
+                                            )}
+                                        </>
+                                    )}
                                 </div>
                             </div>
                         </div>
