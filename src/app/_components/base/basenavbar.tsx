@@ -1,7 +1,9 @@
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
 
-export default async function TablesNavBar() {
+export default function BaseNavBar() {
     return(
         <div className="baymax hover-container configDialogOpen bg-green-100">
             <div className="flex place-items-center justify-between px2 flex-auto top-bar-text-dark h-14 pl-5 pr-5">

@@ -97,7 +97,7 @@ export default function HomeMainContent({ session }: { session: Session }) {
                             </div>
                             <div className="flex flex-col w-full items-start mb-6">
                                 <h4>Today</h4>
-                                <div className="flex items-center w-full">
+                                <div className="flex flex-col gap-2 items-center w-full">
                                     { isLoading ? (
                                         <p>Loading...</p>
                                     ) : error ? (
@@ -106,7 +106,9 @@ export default function HomeMainContent({ session }: { session: Session }) {
                                         <>
                                             {bases && bases.length > 0 ? (
                                                 bases.map((base) => (
-                                                    <BaseListItem key={base.id} base={base} />
+                                                    <div key={base.id} className="w-full">
+                                                        <BaseListItem key={base.id} base={base} />
+                                                    </div>
                                                 ))
                                             ) : (
                                                 <p>No bases available</p>

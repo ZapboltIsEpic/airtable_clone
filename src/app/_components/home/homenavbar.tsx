@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import Image from "next/image"
 import Link from "next/link"
 
-export default function HomeNavBar() {
+export default function HomeNavBar({ toggleSideBar }: { toggleSideBar: () => void }) {
     const session = localStorage.getItem('sb-xasktggrrutkhavrsexk-auth-token');
     
     // If no session, redirect to the login page
@@ -11,18 +11,13 @@ export default function HomeNavBar() {
         redirect("/login");
     }
 
-    // session.user.id
-    // const { data, error } = await supabase
-    //     .from('bases')
-    //     .select()
-
     return (
         <div>
             <header className="flex place-items-center w-full colors-background-default flex-none shadow-elevation-low h-14 z-20">
                 <nav className="flex place-items-center w-full pl-4 pr-8">
                     <div className="flex flex-1 place-items-center">
                         <div className="flex flex-auto place-items-center">
-                            <button>
+                            <button onClick={toggleSideBar}>
                                 <Image src="hamburger-menu-svgrepo-com.svg" alt="." width={20} height={20} />
                             </button>
                             <Link className="px-3 flex place-items-center" aria-label="Airtable home" href="/">

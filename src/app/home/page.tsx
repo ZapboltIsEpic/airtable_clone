@@ -25,11 +25,16 @@ export default function HomePage() {
         }
     }, []); 
 
+    const [isSideBarExpanded, setIsSideBarExpanded] = useState(false);
+    const toggleSideBar = () => {
+        setIsSideBarExpanded(!isSideBarExpanded);
+    };
+
     return (
         <div>
-            <HomeNavBar></HomeNavBar>
+            <HomeNavBar toggleSideBar={toggleSideBar}></HomeNavBar>
             <div className="flex flex-auto">
-                <HomeSideBar></HomeSideBar>
+                <HomeSideBar session={session} isExpanded={isSideBarExpanded}></HomeSideBar>
                 <HomeMainContent session={session}/>
             </div>
         </div>

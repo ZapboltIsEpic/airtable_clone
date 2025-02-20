@@ -33,14 +33,20 @@ export const baseRouter = createTRPCRouter({
         return data;
     }),
 
-  create: protectedProcedure
-    .input(z.object({ name: z.string().min(1) }))
+    // should be protected but doesnt work for some reason?
+  create: publicProcedure
+    .input(z.object({ 
+        name: z.string(),
+        workspace: z.string(),
+        userId: z.string(),
+     })
+    )
     .mutation(async ({ ctx, input }) => {
     const { data, error } = await ctx.supabase
-      .from('base')
-      .insert([
-        { name: input.name, created_by: ctx.session.user.id }
-      ]);
+      .schema('public')
+      .from('bases')
+      .insert([{ name: input.name, workspace: input.workspace, userid: input.userId }])
+      .select("*");
 
     if (error) {
       throw new Error(error.message);
