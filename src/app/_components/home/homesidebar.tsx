@@ -6,7 +6,7 @@ import { useState } from "react";
 // import CreateBasePopUp from "createbasepopup";
 import { api } from "~/trpc/react";
 // import { useRouter } from "next/router";
-import { Session } from "@supabase/supabase-js"
+import { Session } from '@prisma/client';
 
 export default function HomeSideBar({ session, isExpanded }: { session: Session; isExpanded: boolean }) {
 

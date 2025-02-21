@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import Base from "@supabase/supabase-js"
+import { Base } from '@prisma/client';
 
 export default function BaseListItem({ base }: { base: Base }) {
     return (
