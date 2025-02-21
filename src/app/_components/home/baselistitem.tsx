@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export default function BaseListItem({ base }: { base: Base }) {
     return (
@@ -10,10 +11,12 @@ export default function BaseListItem({ base }: { base: Base }) {
                             <span className="text-xs">{ base.name.substring(0,2) }</span> 
                         </div>
                         <div className="flex items-center h-full truncate px-6">
-                            <a className="flex-auto text-left flex items-center" href="/base">
-                                {/* HREF SHOULD LINK TO SPECIFIC BASE */}
+                            <Link className="flex-auto text-left flex items-center" href={{
+                                pathname: "/base",
+                                query: { baseid: JSON.stringify(base.id) }, 
+                            }}>
                                 <h3 className="text-sm font-bold"> { base.name }</h3>
-                            </a>
+                            </Link>
                         </div>
                     </div>
                     <div className="opacity-75 grid grid-cols-3 text-left items-center w-full gap-x-6">

@@ -1,18 +1,15 @@
 'use client';
 
 import { useEffect, useState } from 'react'
-import { redirect } from 'next/navigation';
+import { redirect, useRouter, useSearchParams } from 'next/navigation';
 import BaseNavBar from '../_components/base/basenavbar'
 import BaseMainContent from '../_components/base/basemaincontent';
+import { api } from '~/trpc/react';
 
 export default function BasePage() {
-    interface Session {
-        user: {
-            id: string;
-        };
-    }
-
-    const [session, setSession] = useState<Session | null>(null);
+    const searchParams = useSearchParams();
+    const id = searchParams.get('baseid')?.replace(/^"|"$/g, '');
+    console.log(id);
 
     useEffect(() => {
         const storedSession = localStorage.getItem("sb-xasktggrrutkhavrsexk-auth-token");
@@ -22,11 +19,30 @@ export default function BasePage() {
         else {
             redirect("/login");
         }
-    }, []); 
+    }, []);
+
+    interface Session {
+        user: {
+            id: string;
+        };
+    }
+
+    const [session, setSession] = useState<Session | null>(null);
+
+    const { data: base, isLoading, error } = api.base.getSpecificBase.useQuery(
+        { id: id as UUID }, 
+        { enabled: !!id} 
+    );
+
+    if (isLoading) return <div>Loading...</div>;
+
+    if (error) {
+        alert("error occurred when accessing specific base");
+    }
 
     return (
         <div>
-            <BaseNavBar />
+            <BaseNavBar base={base[0]}/>
             <BaseMainContent />
         </div>
     )

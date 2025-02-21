@@ -3,21 +3,23 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
-export default function BaseNavBar() {
+export default function BaseNavBar({ base }: { base: Base }) {
+
+
     return(
         <div className="baymax hover-container configDialogOpen bg-green-100">
             <div className="flex place-items-center justify-between px2 flex-auto top-bar-text-dark h-14 pl-5 pr-5">
                 <div className="flex flex-auto relative place-items-center min-w-400">
                     <div className="flex place-items-center min-w-60">
                         <div className="justify-items-center w-10">
-                            <Link className="mr2 flex flex-none relative circle focus-visible-current-color border-darken3 w-6 h-6" href="/">
+                            <Link className="mr2 flex flex-none relative circle focus-visible-current-color border-darken3 w-6 h-6" href="/home">
                                 <Image src="/airtable-navbar-icon.PNG" alt="Airtable Navbar Icon" width={24} height={24} />
                             </Link>
                         </div>
                         <button aria-label="Open base settings menu" className="flex place-items-center flex-auto max-w-480">
                             <div className="flex place-items-center huge pointer line-height-3 focus-visible-current-color rounded css-w1u7fo lightColoredBase min-w-0 flex-initial">
                                 <div className="truncate font-family-display-updated heading-size-small strongest min-w-0 flex-initial leading-6">
-                                    YiJun Copy of Airtable
+                                    { base.name }
                                 </div>
                                 <svg className="w-4 h-4 flex-none ml-half" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                     <polyline points="6 9 12 15 18 9"></polyline>

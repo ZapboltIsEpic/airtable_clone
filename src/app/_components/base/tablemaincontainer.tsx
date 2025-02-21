@@ -8,6 +8,7 @@ import {
     getCoreRowModel,
     useReactTable,
   } from '@tanstack/react-table'
+import Image from 'next/image';
 
   type Person = {
     firstName: string
@@ -86,59 +87,52 @@ export default function TableMainContainer() {
         getCoreRowModel: getCoreRowModel(),
     });
 
-    
-
     return (
-        <div className="p-2">
-            <table>
-                <thead>
-                {table.getHeaderGroups().map(headerGroup => (
-                    <tr key={headerGroup.id}>
-                    {headerGroup.headers.map(header => (
-                        <th key={header.id}>
-                        {header.isPlaceholder
-                            ? null
-                            : flexRender(
+        <div className="h-full">
+            <div className="flex h-[calc(100vh-132px)] flex-row">
+                <div className="h-full w-full border border-gray-300">
+                <table className="border-collapse">
+                    <thead className="h-8 border">
+                    <tr>
+                        {table.getFlatHeaders().map((header, index) => (
+                        <th
+                            key={header.id}
+                            className="w-40 border bg-gray-100 px-2 text-left text-sm font-normal"
+                        >
+                            {flexRender(
                                 header.column.columnDef.header,
-                                header.getContext()
+                                header.getContext(),
                             )}
                         </th>
-                    ))}
-                    </tr>
-                ))}
-                </thead>
-                <tbody>
-                {table.getRowModel().rows.map(row => (
-                    <tr key={row.id}>
-                    {row.getVisibleCells().map(cell => (
-                        <td key={cell.id}>
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                        </td>
-                    ))}
-                    </tr>
-                ))}
-                </tbody>
-                <tfoot>
-                {table.getFooterGroups().map(footerGroup => (
-                    <tr key={footerGroup.id}>
-                    {footerGroup.headers.map(header => (
-                        <th key={header.id}>
-                        {header.isPlaceholder
-                            ? null
-                            : flexRender(
-                                header.column.columnDef.footer,
-                                header.getContext()
-                            )}
+                        ))}
+                        <th className="w-12 bg-gray-100 px-2">
+                        <button>
+                            <Image src="plus-svgrepo-com.svg" alt="+" width={16} height={16} />
+                        </button>
                         </th>
-                    ))}
                     </tr>
-                ))}
-                </tfoot>
-            </table>
-            <div className="h-4" />
-            {/* <button onClick={() => rerender()} className="border p-2">
-                Rerender
-            </button> */}
+                    </thead>
+                    <tbody>
+                    {table.getRowModel().rows.map((row, rowIdx) => (
+                        <tr key={row.id} className="h-8">
+                        {row.getVisibleCells().map((cell, cellIdx) => (
+                            <td
+                            key={cell.id}
+                            className="border border-gray-300 px-2 py-1 text-xs font-normal"
+                            >
+                            {cellIdx === 0 ? rowIdx + 1 : null}
+                            {flexRender(
+                                cell.column.columnDef.cell,
+                                cell.getContext(),
+                            )}
+                            </td>
+                        ))}
+                        </tr>
+                    ))}
+                    </tbody>
+                </table>
+                </div>
+            </div>
         </div>
     )
 }

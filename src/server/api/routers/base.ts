@@ -9,14 +9,6 @@ import {
 } from "~/server/api/trpc";
 
 export const baseRouter = createTRPCRouter({
-  hello: publicProcedure
-    .input(z.object({ text: z.string() }))
-    .query(({ input }) => {
-    return {
-      greeting: `Hello ${input.text}`,
-    };
-    }),
-
   get: publicProcedure
     .input(z.object({ userId: z.string() }))
     .query(async ({ input, ctx }) => {
@@ -32,6 +24,24 @@ export const baseRouter = createTRPCRouter({
 
         return data;
     }),
+  
+  // should only return 1 base
+  getSpecificBase: publicProcedure
+  .input(z.object({ id: z.string().uuid() }))
+  .query(async ({ input, ctx }) => {
+      const { data, error } = await ctx.supabase
+        .schema('public')
+        .from('bases')
+        .select('*')
+        .eq('id', input.id);
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      return data;
+  }),
+
 
     // should be protected but doesnt work for some reason?
   create: publicProcedure
