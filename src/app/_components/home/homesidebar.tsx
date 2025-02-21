@@ -6,8 +6,9 @@ import { useState } from "react";
 // import CreateBasePopUp from "createbasepopup";
 import { api } from "~/trpc/react";
 // import { useRouter } from "next/router";
+import { Session } from "@supabase/supabase-js"
 
-export default function HomeSideBar({ session, isExpanded }) {
+export default function HomeSideBar({ session, isExpanded }: { session: Session; isExpanded: boolean }) {
 
     const [isHovered, setIsHovered] = useState(false);
     // const router = useRouter()

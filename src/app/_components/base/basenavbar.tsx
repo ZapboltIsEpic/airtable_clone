@@ -2,8 +2,9 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { Base } from '@prisma/client';
 
-export default function BaseNavBar({ base }) {
+export default function BaseNavBar({ base }: { base: Base }) {
 
 
     return(

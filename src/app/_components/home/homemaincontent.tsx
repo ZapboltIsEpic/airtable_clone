@@ -5,8 +5,9 @@ import { api } from "~/trpc/react";
 import Image from "next/image"
 import TableCreationWayFlexBox from "../tablecreationwayflexbox"
 import BaseListItem from "./baselistitem";
+import { Session } from "@supabase/supabase-js"
 
-export default function HomeMainContent({ session }) {
+export default function HomeMainContent({ session }: { session: Session }) {
     const { data: bases, isLoading, error } = api.base.get.useQuery(
         { userId: session?.user?.id ?? "" }, 
         { enabled: !!session?.user?.id } 

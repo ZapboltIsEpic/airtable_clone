@@ -1,7 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
+import Base from "@supabase/supabase-js"
 
-export default function BaseListItem({ base }) {
+export default function BaseListItem({ base }: { base: Base }) {
     return (
         <div className="flex items-center w-full">
             <div className="relative pointer rounded-lg w-full colors-background-selected-hover">
