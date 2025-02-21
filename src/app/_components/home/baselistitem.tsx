@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-export default function BaseListItem({ base }: { base: Base }) {
+export default function BaseListItem({ base }) {
     return (
         <div className="flex items-center w-full">
             <div className="relative pointer rounded-lg w-full colors-background-selected-hover">

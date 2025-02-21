@@ -7,7 +7,7 @@ import { useState } from "react";
 import { api } from "~/trpc/react";
 // import { useRouter } from "next/router";
 
-export default function HomeSideBar({ session, isExpanded }: { session: Session; isExpanded: boolean }) {
+export default function HomeSideBar({ session, isExpanded }) {
 
     const [isHovered, setIsHovered] = useState(false);
     // const router = useRouter()

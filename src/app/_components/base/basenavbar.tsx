@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
-export default function BaseNavBar({ base }: { base: Base }) {
+export default function BaseNavBar({ base }) {
 
 
     return(

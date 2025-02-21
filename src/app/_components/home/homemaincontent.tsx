@@ -6,7 +6,7 @@ import Image from "next/image"
 import TableCreationWayFlexBox from "../tablecreationwayflexbox"
 import BaseListItem from "./baselistitem";
 
-export default function HomeMainContent({ session }: { session: Session }) {
+export default function HomeMainContent({ session }) {
     const { data: bases, isLoading, error } = api.base.get.useQuery(
         { userId: session?.user?.id ?? "" }, 
         { enabled: !!session?.user?.id } 
