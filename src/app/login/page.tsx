@@ -48,6 +48,9 @@ export default function LoginPage() {
     if (!response.ok) {
       alert("error occurred");
     }
+    else {
+      alert("Signed Up Successfully");
+    }
     console.log({response});
   }
 

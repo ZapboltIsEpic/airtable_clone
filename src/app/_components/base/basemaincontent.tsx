@@ -1,9 +1,13 @@
 'use client';
 
+import TableContainer from "./tablecontainer";
+import TablesAddControlsContainer from "./tablesaddcontrolscontainer";
+
 export default function BaseMainContent() {
     return (
         <div>
-            This is base main content.
+            <TablesAddControlsContainer />
+            <TableContainer />
         </div>
     )
 }
