@@ -1,12 +1,13 @@
 'use client';
 
+import { Base } from "@prisma/client";
 import TableContainer from "./tablecontainer";
 import TablesAddControlsContainer from "./tablesaddcontrolscontainer";
 
-export default function BaseMainContent() {
+export default function BaseMainContent({ base } : { base: Base }) {
     return (
         <div>
-            <TablesAddControlsContainer />
+            <TablesAddControlsContainer base={base}/>
             <TableContainer />
         </div>
     )

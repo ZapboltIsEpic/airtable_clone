@@ -7,6 +7,7 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
+import { api } from "~/trpc/server";
 
 export const baseRouter = createTRPCRouter({
   get: publicProcedure
@@ -52,16 +53,30 @@ export const baseRouter = createTRPCRouter({
      })
     )
     .mutation(async ({ ctx, input }) => {
-    const { data, error } = await ctx.supabase
-      .schema('public')
-      .from('bases')
-      .insert([{ name: input.name, workspace: input.workspace, userid: input.userId }])
-      .select("*");
+      const { data, error } = await ctx.supabase
+        .schema('public')
+        .from('bases')
+        .insert([{ name: input.name, workspace: input.workspace, userid: input.userId }])
+        .select("*");
 
-    if (error) {
-      throw new Error(error.message);
-    }
+      if (error) {
+        throw new Error(error.message);
+      }
 
-    return data;
+      const baseId = data[0].id;
+      
+      const { error: tableError } = await ctx.supabase
+        .schema('public')
+        .from('tables')
+        .insert([{ 
+            name: "Table 1", 
+            baseid: baseId 
+        }]);
+
+      if (tableError) {
+          throw new Error(tableError.message);
+      }
+
+      return data;
     }),
 });

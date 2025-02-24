@@ -25,7 +25,7 @@ export default function HomeSideBar({ session, isExpanded }: { session: Session;
     const { mutate: createBase, isLoading, error } = api.base.create.useMutation({
         onSuccess: () => {
           console.log("Base created successfully");
-        //   router.reload();
+          alert("Base created successfully");
         },
         onError: (error) => {
           console.error("Error creating base:", error);
@@ -113,7 +113,7 @@ export default function HomeSideBar({ session, isExpanded }: { session: Session;
                                 </button>
                                 <button onClick={() => {
                                         createBase({
-                                            name: "Unnamed Base",
+                                            name: "Untitled Base",
                                             workspace: "Default Workspace",
                                             userId: session?.user?.id ?? "",
                                         });

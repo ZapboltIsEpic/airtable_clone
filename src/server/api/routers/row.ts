@@ -9,8 +9,7 @@ import {
 } from "~/server/api/trpc";
 
 export const rowRouter = createTRPCRouter({
-
-  get: publicProcedure
+  getAllRowsByTableId: publicProcedure
     .input(z.object({ tableid: z.string() }))
     .query(async ({ input, ctx }) => {
         const { data, error } = await ctx.supabase

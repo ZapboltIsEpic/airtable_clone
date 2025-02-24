@@ -10,7 +10,7 @@ import {
 
 export const columnRouter = createTRPCRouter({
 
-  get: publicProcedure
+  getAllColsByRowId: publicProcedure
     .input(z.object({ rowid: z.string() }))
     .query(async ({ input, ctx }) => {
         const { data, error } = await ctx.supabase

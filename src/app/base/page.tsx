@@ -43,7 +43,7 @@ export default function BasePage() {
     return (
         <div>
             <BaseNavBar base={base[0]}/>
-            <BaseMainContent />
+            <BaseMainContent base={base[0]}/>
         </div>
     )
 }
