@@ -13,17 +13,54 @@ export const tableRouter = createTRPCRouter({
   getAllTables: publicProcedure
     .input(z.object({ baseid: z.string().uuid() }))
     .query(async ({ input, ctx }) => {
-        const { data, error } = await ctx.supabase
+      const { data, error } = await ctx.supabase
+        .schema('public')
+        .from('tables')
+        .select('*')
+        .eq('baseid', input.baseid);
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      return data;
+    }),
+
+    getTableRowsAndColumns: publicProcedure
+    .input(z.object({ tableid: z.string().uuid() }))
+    .query(async ({ input, ctx }) => {
+      try {
+        const { data: rows, error: rowError } = await ctx.supabase
           .schema('public')
-          .from('tables')
+          .from('rows')
           .select('*')
-          .eq('baseid', input.baseid);
-
-        if (error) {
-          throw new Error(error.message);
+          .eq('tableid', input.tableid);
+    
+        if (rowError || !rows || rows.length === 0) {
+          throw new Error('No rows found for this table.');
         }
-
-        return data;
+    
+        // Fetch columns for each row
+        const columnsPromises = rows.map(async (row) => {
+          const { data: columns, error: columnError } = await ctx.supabase
+            .schema('public')
+            .from('columns')
+            .select('*')
+            .eq('rowid', row.id);
+    
+          if (columnError) {
+            throw new Error(`Error fetching columns for row ${row.id}: ${columnError.message}`);
+          }
+    
+          return { row, columns };
+        });
+    
+        const rowsWithColumns = await Promise.all(columnsPromises);
+        return rowsWithColumns; // Return both rows and columns
+      } catch (error) {
+        console.error('Error fetching table rows and columns:', error);
+        throw error;
+      }
     }),
 
     // should be protected but doesnt work for some reason?
