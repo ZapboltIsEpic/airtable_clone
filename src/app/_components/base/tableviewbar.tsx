@@ -4,7 +4,7 @@ import Image from "next/image";
 
 export default function TableViewBar() {
     return (
-        <div className="flex flex-none">
+        <div className="flex flex-none h-11">
             <div className="flex-none flex items-center">
                 <div className="h-full flex items-center pl-3">
                     <button className="relative rounded-full flex items-center pointer mr-2 h-7">

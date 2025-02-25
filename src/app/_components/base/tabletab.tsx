@@ -18,16 +18,24 @@ export default function TableTab({ table }: { table: Table }) {
     }
 
     return (
-        <div className={isCurrentTable() ? "flex h-8 bg-white" : "flex h-8"}>
+        <div className={isCurrentTable() ? "flex h-8 bg-white rounded-t font-normal" : "flex h-8 rounded-t hover:bg-[#abd4ad] font-light"}>
             <div className="flex relative flex-none">
-                <div className="rounded-lg flex flex-auto relative">
-                    <Link className="h-full flex flex-auto items-center pl-3" href={`${pathname}?${newParams.toString()}`}>
-                        { table.name }
-                    </Link>
-                    <div className="ml-1 flex items-center">
-                        <Image src="down-chevron-svgrepo-com.svg.svg" alt="^" width={16} height={16}></Image>
-                    </div>
+                <Link className={isCurrentTable() ? "h-full flex flex-auto items-center pl-3 pr-8 text-[13px]" : "h-full flex flex-auto items-center pl-3 pr-3 text-[13px]"} 
+                    href={`${pathname}?${newParams.toString()}`}>
+                    { table.name }
+                </Link>
+                <div className="flex justify-center items-center">
+                    <div className="border-l border-gray-600 border-opacity-20 h-4"></div>
                 </div>
+                {isCurrentTable() ? (
+                    <div className="flex items-center">
+                        <div className="absolute bottom-0 right-2 flex items-center h-8 w-6">
+                            <svg className="w-4 h-4 flex-none ml-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </div>
+                    </div>
+                ) : <div />}
             </div>
         </div>
     )

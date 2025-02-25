@@ -37,9 +37,9 @@ export default function TablesAddControlsContainer({base} : { base : Base}) {
     };
 
     return (
-        <div className="relative hide-print bg-green-100">
+        <div className="relative hide-print bg-[rgb(207,245,209)]">
             <div className="flex h-8">
-                <div className="flex flex-auto relative bg-green-200">
+                <div className="flex flex-auto relative bg-[#bae6bc] rounded-tr">
                     <div className="absolute all-0 pl-3">
                         <div className="flex flex-auto pt-1 -mt-1 pl-1 -ml-1">
                             <nav className="flex flex-none">   
@@ -51,8 +51,13 @@ export default function TablesAddControlsContainer({base} : { base : Base}) {
                             </nav>
                             <div className="flex">
                                 <button aria-label="Search all tables" className="pointer flex flex-none justify-center items-center px-3">
-                                    <Image src="down-chevron-svgrepo-com.svg.svg" alt="^" width={16} height={16}></Image>
+                                    <svg className="w-4 h-4 flex-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
+                                        <polyline points="6 9 12 15 18 9"></polyline>
+                                    </svg>
                                 </button>
+                                <div className="flex justify-center items-center">
+                                    <div className="border-l border-gray-600 border-opacity-20 h-4"></div>
+                                </div>
                             </div>
                             <div className="flex-none flex relative">
                                 <button onClick={() => {
@@ -62,27 +67,28 @@ export default function TablesAddControlsContainer({base} : { base : Base}) {
                                     } ,
                                 )
                                 }} aria-label="Add or import tables" className="pointer flex items-center flex-none rounded-full px-3 h-8">
-                                    <Image src="plus-svgrepo-com.svg" alt="^" width={16} height={16}></Image>
-                                    <p>Add or import</p>
+                                    <Image className="opacity-50 flex-none my-1" src="plus-svgrepo-com.svg" alt="^" width={16} height={16}></Image>
+                                    <p className="text-[13px] ml-2 font-normal">Add or import</p>
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div className="px=1 rounded-big-top-right"></div>
-                <div className="flex-none flex items-center ml-2 rounded-big-top-left bg-green-200">
+                <div className="flex-none flex items-center ml-2 rounded-tl bg-[#bae6bc]">
                     <div className="flex h-8">
                         <div className="flex">
                             <button className="flex items-center pointer px-3">
-                                <div className="flex items-center">
+                                <div className="flex items-center text-[13px]">
                                     <div>Extensions</div>
                                 </div>
                             </button>
                         </div>
                         <div className="flex">
                             <button className="flex items-center pointer px-3">
-                                <div className="pr-1">Tools</div>
-                                <Image src="down-chevron-svgrepo-com.svg.svg" alt="^" width={16} height={16}></Image>
+                                <div className="pr-1 text-[13px]">Tools</div>
+                                <svg className="w-4 h-4 flex-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
                             </button>
                         </div>
                     </div>
