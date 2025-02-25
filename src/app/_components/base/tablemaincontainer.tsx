@@ -13,6 +13,7 @@ export default function TableMainContainer() {
 
   const [tableData, setTableData] = useState([]);
   const [columns, setColumns] = useState([]);
+  const [rowids, setRowIds] = useState([]);
 
   const { data, isLoading, error } = api.table.getTableRowsAndColumns.useQuery(
     { tableid: tableId}, 
@@ -24,12 +25,15 @@ export default function TableMainContainer() {
       console.error("Error fetching table data:", error);
       setTableData([]);
       setColumns([]);
+      setRowIds([]);
       return;
     }
 
     // Process rows
+    const rowids_ = [];
     const rows = data.map((rowWithColumns) => {
       const rowData = {};
+      rowids_.push(rowWithColumns.row.id);
       rowWithColumns.columns.forEach((column) => {
         rowData[column.fieldname.toLowerCase()] = column.columncontent;
       });
@@ -53,6 +57,7 @@ export default function TableMainContainer() {
     // Update state
     setTableData(rows);
     setColumns(tableColumns);
+    setRowIds(rowids_);
   }, [data, error]);
 
   const table = useReactTable({
@@ -60,6 +65,16 @@ export default function TableMainContainer() {
     data: tableData,
     getCoreRowModel: getCoreRowModel(),
   });
+
+  const { mutate: createNewCol, error : createNewColError } = api.column.createNewCol.useMutation({
+    onSuccess: () => {
+      console.log("Column created successfully");
+      alert("Column created successfully");
+    },
+    onError: (createNewColError) => {
+      console.error("Error creating column:", createNewColError);
+    },
+});
 
   return (
     <div className="h-full">
@@ -75,7 +90,12 @@ export default function TableMainContainer() {
                     </th>
                   ))}
                   <th className="w-12 bg-gray-100 px-2">
-                    <button>
+                    <button onClick={() => {
+                        createNewCol({
+                          fieldname: "Untitled",
+                          rowids: rowids,
+                        });
+                    }}>
                       <Image src="plus-svgrepo-com.svg" alt="+" width={16} height={16} />
                     </button>
                   </th>

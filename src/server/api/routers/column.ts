@@ -26,7 +26,26 @@ export const columnRouter = createTRPCRouter({
         return data;
     }),
 
-    // should be protected but doesnt work for some reason?
+  
+  createNewCol: publicProcedure
+    .input(z.object({
+      rowids: z.string().array(),
+      fieldname: z.string(),
+    })
+    )
+    .mutation(async ({ ctx, input }) => {
+      for (const rowid of input.rowids) {
+        const { error } = await ctx.supabase
+          .schema('public')
+          .from('columns')
+          .insert([{ rowid : rowid, fieldname: input.fieldname, columncontent: ""}])
+          
+        if (error) {
+          throw new Error(error.message);
+        }
+      }
+    }),
+  
   create: publicProcedure
     .input(z.object({ 
         rowid: z.string(),
