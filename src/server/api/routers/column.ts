@@ -45,6 +45,26 @@ export const columnRouter = createTRPCRouter({
         }
       }
     }),
+
+  
+  updateColContent: publicProcedure
+    .input(z.object({
+      rowid: z.string().uuid(),
+      fieldname: z.string(),
+      columncontent: z.string(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const { error } = await ctx.supabase
+        .schema('public')
+        .from('columns')
+        .update({ 'columncontent': input.columncontent })
+        .eq('rowid', input.rowid)
+        .eq('fieldname', input.fieldname)
+
+      if (error) {
+        throw new Error(error.message);
+      }
+    }),
   
   create: publicProcedure
     .input(z.object({ 
