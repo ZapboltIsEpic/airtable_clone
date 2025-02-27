@@ -32,23 +32,23 @@ export default function BaseNavBar({ base }: { base: Base }) {
                     <nav className="flex items-center justify-center">
                         <ul className="flex items-center justify-center list-none m-4">
                             <li>
-                                <button className="mr-2 text-[13px] font-sans h-7 inline-flex justify-center items-center px-3 list-item rounded-full bg-[rgb(175,222,177)] align-middle" href="/">
+                                <button className="mr-2 text-[13px] font-sans h-7 inline-flex justify-center items-center px-3 list-item rounded-full bg-[rgb(175,222,177)] align-middle">
                                     <p className="font-sans leading-4 font-normal">Data</p>
                                 </button>
                             </li>
                             <li>
-                                <button className="mr-2 text-[13px] font-[apple-system]  h-7 flex-inline justify-items-center place-items-center px-3 list-item rounded-full hover:bg-[rgb(175,222,177)]" href='/'>
+                                <button className="mr-2 text-[13px] font-[apple-system]  h-7 flex-inline justify-items-center place-items-center px-3 list-item rounded-full hover:bg-[rgb(175,222,177)]">
                                     <p className="font-sans leading-4 font-light">Automations</p>
                                 </button>
                             </li>
                             <li>
-                                <button className="mr-2 text-[13px] h-7 flex-inline justify-items-center place-items-center px-3 list-item rounded-full hover:bg-[rgb(175,222,177)]" href='/'>
+                                <button className="mr-2 text-[13px] h-7 flex-inline justify-items-center place-items-center px-3 list-item rounded-full hover:bg-[rgb(175,222,177)]">
                                     <p className="font-sans leading-4 font-light">Interfaces</p>
                                 </button>
                             </li>
                             <div className="border-l border-gray-600 ml-1 h-5 border-opacity-20"></div>
                             <li className="pl-3">
-                                <button className="mr-2 text-[13px] font-[apple-system]  h-7 flex-inline justify-items-center place-items-center px-3 list-item rounded-full hover:bg-[rgb(175,222,177)]" href='/'>
+                                <button className="mr-2 text-[13px] font-[apple-system]  h-7 flex-inline justify-items-center place-items-center px-3 list-item rounded-full hover:bg-[rgb(175,222,177)]">
                                     <p className="font-sans leading-4 font-light">Forms</p>
                                 </button>
                             </li>

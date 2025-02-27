@@ -30,8 +30,6 @@ export default function TableMainContainer({ showFindBar, toggleFindBar } : Tabl
     { enabled: !!tableId } 
   );
 
-  console.log(tableData);
-
   useEffect(() => {
     if (error || !data || data.length === 0) {
       console.error("Error fetching table data:", error);
@@ -40,13 +38,6 @@ export default function TableMainContainer({ showFindBar, toggleFindBar } : Tabl
       setRowIds([]);
       return;
     }
-
-    // if (searchTerm) {
-    //   const firstHighlightedElement = document.querySelector('[data-highlighted="true"]');
-    //   if (firstHighlightedElement) {
-    //     firstHighlightedElement.scrollIntoView({ behavior: "smooth", block: "center" });
-    //   }
-    // }
 
     const rowids_ = [];
     const rows = data.map((rowWithColumns) => {
