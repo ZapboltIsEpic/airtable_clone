@@ -98,96 +98,74 @@ export default function TableMainContainer() {
   });
 
   const mutation = api.column.updateColContent.useMutation();
+  const { mutateAsync: createNewColApi } = api.column.createNewCol.useMutation();
+  const { mutateAsync: createNewRowApi } = api.row.createNewRow.useMutation();
 
-  // optimistic updates...
-  // const { mutate : createNewCol, } = useMutation({
-  //   mutationFn: async (newColumn) => {
-  //     // Call your API or mutation logic
-  //     const response = await api.column.createNewCol(newColumn); 
-  //     return response; // Ensure this returns the necessary data
-  //   },
-  
-  //   onMutate: async (newColumn) => {
-  //     // Step 1: Save previous table data for rollback in case of an error
-  //     const previousTableData = [...tableData];
-      
-  //     // Step 2: Optimistically update the table data to include the new column
-  //     const newTableData = tableData.map((row) => {
-  //       return {
-  //         ...row,
-  //         [newColumn.fieldname]: "",  // Add the new column with default value
-  //       };
-  //     });
-  
-  //     // Step 3: Immediately update the table UI with the new column (optimistic update)
-  //     setTableData(newTableData); 
-  
-  //     // Optionally update the cache with the new optimistic data if you're using React Query
-  //     queryClient.setQueryData('tableData', newTableData); 
-  
-  //     // Return the context for possible rollback in case of error
-  //     return { previousTableData };
-  //   },
-  
-  //   onError: (error, newColumn, context) => {
-  //     // Rollback to the previous table data if the mutation failed
-  //     console.error('Error creating column:', error);
-  //     setTableData(context.previousTableData);  // Rollback to previous data
-  
-  //     // Optionally, you can reset the cache or handle errors differently
-  //     queryClient.setQueryData('tableData', context.previousTableData);
-  //   },
-  
-  //   onSettled: () => {
-  //     // Optionally invalidate queries or refetch data after mutation is complete
-  //     queryClient.invalidateQueries('tableData');  // Invalidate the cache and refetch data
-  //   }
-  // })
-
-  // const { mutate: createNewCol, error: createNewColError } = api.column.createNewCol.useMutation({
-  //   onMutate: async (newColumn) => {
-  //     // Save the previous table data to rollback in case of error
-  //     const previousTableData = [...tableData];
-  
-  //     // Optimistically update the table data to include the new column
-  //     const newTableData = tableData.map((row) => {
-  //       return {
-  //         ...row,
-  //         [newColumn.fieldname]: "",  // Add the new column with default value
-  //       };
-  //     });
-  
-  //     // Immediately update the table UI with the new column
-  //     setTableData(newTableData);
-  //     console.log("newtabledata", tableData);
-  
-  //     // Return the context to revert the optimistic update in case of error
-  //     return { previousTableData };
-  //   },
-  //   onError: (err, newColumn, context) => {
-  //     console.error('Error creating column:', err);
-  //     // Rollback to the previous table data if the mutation failed
-  //     setTableData(context.previousTableData);
-  //   },
-  //   onSettled: () => {
-  //     // Optionally invalidate queries or refetch data if necessary
-  //     // queryClient.invalidateQueries({ queryKey: ['columns'] });
-  //   },
-  // });
-
-  const handleCreateColumn = (newColumn) => {
-    createNewCol(newColumn); 
-  };
-
-  const { mutate: createNewRow, error : createNewRowError } = api.row.createNewRow.useMutation({
-    onSuccess: () => {
-      console.log("Row created successfully");
-      alert("Row created successfully");
+  const { mutate : createNewCol, } = useMutation({
+    mutationFn: async (newColumn) => {
+      // Call your API or mutation logic
+      const response = await createNewColApi(newColumn); 
+      return response; // Ensure this returns the necessary data
     },
-    onError: (createNewRowError) => {
-      console.error("Error creating row:", createNewRowError);
+  
+    onMutate: async (newColumn) => {
+      const previousTableData = [...tableData];
+      const newTableData = tableData.map((row) => {
+        return {
+          ...row,
+          [newColumn.fieldname]: "",  
+        };
+      });
+
+      setTableData(newTableData); 
+      return { previousTableData };
     },
-  });
+  
+    onError: (error, newColumn, context) => {
+      console.error('Error creating column:', error);
+      setTableData(context.previousTableData);  
+  
+      // queryClient.setQueryData('tableData', context.previousTableData);
+    },
+  
+    onSettled: () => {
+      // rather than tableData probs have to put back in current format... but that is kinda pain in the ass.
+      queryClient.invalidateQueries('tableData'); 
+    }
+  })
+
+  const { mutate : createNewRow, } = useMutation({
+    mutationFn: async (newRow) => {
+      const response = await createNewRowApi(newRow); 
+      return response; 
+    },
+  
+    onMutate: async (newRow) => {
+      const previousTableData = [...tableData];
+      const newRowData = newRow.fieldnames.reduce((acc, fieldname) => {
+        acc[fieldname] = ""; 
+        return acc;
+      }, {});
+
+      const newTableData = [...tableData, newRowData];
+      setTableData(newTableData); 
+  
+      // queryClient.setQueryData('tableData', newTableData); 
+
+      return { previousTableData };
+    },
+  
+    onError: (error, newColumn, context) => {
+      console.error('Error creating row:', error);
+      setTableData(context.previousTableData);  
+  
+      // queryClient.setQueryData('tableData', context.previousTableData);
+    },
+  
+    onSettled: () => {
+      queryClient.invalidateQueries('tableData'); 
+    }
+  })
 
   return (
     <div className="h-full w-full">

@@ -5,26 +5,59 @@ import { api } from "~/trpc/react";
 import TableTab from "./tabletab";
 import { Base } from "@prisma/client";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export default function TablesAddControlsContainer({base} : { base : Base}) {
     const router = useRouter();
     const searchParams = useSearchParams();
     const pathname = usePathname();
+    const queryClient = useQueryClient();
+
+    const [tablesData, setTablesData] = useState([]);
 
     const { data: tables, isLoading, error } = api.table.getAllTables.useQuery(
         { baseid: base?.id as UUID }, 
         { enabled: !!base?.id }
     );
 
-    const { mutate: createTable, error : createTableError } = api.table.create.useMutation({
-        onSuccess: () => {
-          console.log("Table created successfully");
-          alert("Table created successfully");
+    useEffect(() => {
+        setTablesData(tables);
+    }, [tables]);
+
+    const { mutateAsync: createNewTableApi } = api.table.create.useMutation();
+
+    const { mutate : createTable, } = useMutation({
+        mutationFn: async (newTable) => {
+            const response = await createNewTableApi(newTable); 
+            return response; 
         },
-        onError: (createTableError) => {
-          console.error("Error creating Table:", createTableError);
+        
+        onMutate: async (newTable) => {
+            const previousTablesData = [...tablesData];
+        
+            const newTableData = {
+                name: newTable.name,
+                baseid: newTable.baseid,
+            }
+            const newTablesData = [...tablesData, newTableData];
+            setTablesData(newTablesData); 
+
+            return { previousTablesData };
         },
-    });
+        
+        onError: (error, newColumn, context) => {
+            console.error('Error creating table:', error);
+            setTablesData(context.previousTablesData);  
+        
+            // queryClient.setQueryData('tableData', context.previousTableData);
+        },
+        
+        onSettled: () => {
+            // rather than tableData probs have to put back in current format... but that is kinda pain in the ass.
+            queryClient.invalidateQueries('tablesData'); 
+        }
+    })
 
     const tableCount = tables?.length ?? 0;
     const newTableName = `Table ${tableCount + 1}`;
