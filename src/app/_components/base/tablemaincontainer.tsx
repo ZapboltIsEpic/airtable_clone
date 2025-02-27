@@ -21,6 +21,8 @@ export default function TableMainContainer({ showFindBar, toggleFindBar } : Tabl
   const [columns, setColumns] = useState([]);
   const [rowids, setRowIds] = useState([]);
   const [fieldnames, setFieldNames] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+
   const queryClient = useQueryClient();
 
   const { data, isLoading, error } = api.table.getTableRowsAndColumns.useQuery(
@@ -38,6 +40,13 @@ export default function TableMainContainer({ showFindBar, toggleFindBar } : Tabl
       setRowIds([]);
       return;
     }
+
+    // if (searchTerm) {
+    //   const firstHighlightedElement = document.querySelector('[data-highlighted="true"]');
+    //   if (firstHighlightedElement) {
+    //     firstHighlightedElement.scrollIntoView({ behavior: "smooth", block: "center" });
+    //   }
+    // }
 
     const rowids_ = [];
     const rows = data.map((rowWithColumns) => {
@@ -65,37 +74,49 @@ export default function TableMainContainer({ showFindBar, toggleFindBar } : Tabl
       cell: ({ getValue, row, column }) => {
         const initialValue = getValue();
         const [value, setValue] = useState(initialValue);
-
+  
         const onBlur = () => {
-          if (value !== initialValue) { 
+          if (value !== initialValue) {
             mutation.mutate({
               rowid: rowids_[row.index],
               columncontent: value,
-              // column.id is fieldname for some reason, dont change
               fieldname: column.id,
             });
           }
           row.original[column.id] = value;
-
-          console.log("row index", row.index);
         };
-    
+
+        const isHighlighted =
+          searchTerm != "" && 
+          value != "" && 
+          value.toLowerCase().includes(searchTerm.toLowerCase());
+
         return (
-          <input
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-            onBlur={onBlur}
-            className="w-[180px] h-[32px]"
-          />
+          <div className={`w-[180px] h-[32px] flex items-center justify-center`}>
+            <input
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+              onBlur={onBlur}
+              className={`w-full h-full outline-none ${isHighlighted ? "bg-[rgb(255,243,211)]" : ""}`}
+              data-highlighted={isHighlighted ? "true" : "false"}
+            />
+          </div>
         );
-      }
+      },
     }));
 
     // Update state
     setTableData(rows);
     setColumns(tableColumns);
     setRowIds(rowids_);
-  }, [data, error]);
+  }, [data, error, searchTerm]);
+
+  if (searchTerm) {
+    const firstHighlightedElement = document.querySelector('[data-highlighted="true"]');
+    if (firstHighlightedElement) {
+      firstHighlightedElement.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }
 
   const table = useReactTable({
     columns,
@@ -177,7 +198,7 @@ export default function TableMainContainer({ showFindBar, toggleFindBar } : Tabl
     <div className="h-full w-full">
       <div className="flex h-[calc(100vh-132px)] flex-row">
         <div className="h-full w-full border border-gray-300">
-          {showFindBar && <FindBarContainer toggleFindBar={toggleFindBar}/>}
+          {showFindBar && <FindBarContainer toggleFindBar={toggleFindBar} setSearchTerm={setSearchTerm}/>}
           <table className="table-fixed border-collapse overflow-scroll">
             <thead className="h-8 border">
               {table.getHeaderGroups().map((headerGroup) => (
