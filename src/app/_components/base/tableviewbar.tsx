@@ -2,7 +2,11 @@
 
 import Image from "next/image";
 
-export default function TableViewBar() {
+interface TableViewBarProps {
+    toggleFindBar: () => void;
+}
+
+export default function TableViewBar({ toggleFindBar } : TableViewBarProps) {
     return (
         <div className="flex flex-none h-11 z-10">
             <div className="flex-none flex items-center">
@@ -97,7 +101,7 @@ export default function TableViewBar() {
                     </div>
                 </div>
             </div>
-            <button className="flex flex-none w-8">
+            <button onClick={toggleFindBar} className="flex flex-none w-8">
                 <div className="flex items-center">
                     <Image src="/magnifying-glass-backup-svgrepo-com.svg" alt="." width={16} height={16} />
                 </div>

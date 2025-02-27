@@ -6,8 +6,14 @@ import { QueryClient, useMutation, useQuery, useQueryClient } from "@tanstack/re
 import { flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import Image from "next/image";
 import { api } from "~/trpc/react"; 
+import FindBarContainer from "./findbarcontainer";
 
-export default function TableMainContainer() {
+interface TableMainContainerProps {
+  showFindBar: boolean;
+  toggleFindBar: () => void;
+}
+
+export default function TableMainContainer({ showFindBar, toggleFindBar } : TableMainContainerProps) {
   const searchParams = useSearchParams();
   const tableId = searchParams.get("tableid");
 
@@ -171,6 +177,7 @@ export default function TableMainContainer() {
     <div className="h-full w-full">
       <div className="flex h-[calc(100vh-132px)] flex-row">
         <div className="h-full w-full border border-gray-300">
+          {showFindBar && <FindBarContainer toggleFindBar={toggleFindBar}/>}
           <table className="table-fixed border-collapse overflow-scroll">
             <thead className="h-8 border">
               {table.getHeaderGroups().map((headerGroup) => (
