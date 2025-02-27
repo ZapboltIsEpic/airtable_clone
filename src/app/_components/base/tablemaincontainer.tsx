@@ -58,7 +58,7 @@ export default function TableMainContainer({ showFindBar, toggleFindBar } : Tabl
 
     const rowids_: string[] = [];
     const rows = data.map((rowWithColumns : RowWithColumns) => {
-      const rowData = {};
+      const rowData: Record<string, string> = {};
       rowids_.push(rowWithColumns.row.id);
       rowWithColumns.columns.forEach((column) => {
         rowData[column.fieldname] = column.columncontent;
