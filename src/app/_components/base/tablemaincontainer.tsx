@@ -26,7 +26,7 @@ export default function TableMainContainer({ showFindBar, toggleFindBar } : Tabl
   const queryClient = useQueryClient();
 
   const { data, isLoading, error } = api.table.getTableRowsAndColumns.useQuery(
-    { tableid: tableId}, 
+    { tableid: tableId! }, 
     { enabled: !!tableId } 
   );
 
