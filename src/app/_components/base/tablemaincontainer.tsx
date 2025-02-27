@@ -68,7 +68,7 @@ export default function TableMainContainer({ showFindBar, toggleFindBar } : Tabl
 
     // Extract unique fieldnames for columns
     const fieldNames_ = new Set();
-    data.forEach((rowWithColumns) => {
+    data.forEach((rowWithColumns : RowWithColumns) => {
       rowWithColumns.columns.forEach((col) => {
         fieldNames_.add(col.fieldname);
       });
