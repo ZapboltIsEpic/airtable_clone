@@ -39,7 +39,7 @@ export default function TableMainContainer({ showFindBar, toggleFindBar } : Tabl
       return;
     }
 
-    const rowids_ = [];
+    const rowids_: string[] = [];
     const rows = data.map((rowWithColumns) => {
       const rowData = {};
       rowids_.push(rowWithColumns.row.id);
