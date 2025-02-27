@@ -13,6 +13,23 @@ interface TableMainContainerProps {
   toggleFindBar: () => void;
 }
 
+interface RowWithColumns {
+  row: {
+    id: string;
+    tableid: string;
+    createdat: string | Date; // ISO string or Date object
+    updatedat: string | Date;
+  };
+  columns: {
+    id: string;
+    fieldname: string;
+    columncontent: string;
+    rowid: string;
+    createdat: string | Date;
+    updatedat: string | Date;
+  }[];
+}
+
 export default function TableMainContainer({ showFindBar, toggleFindBar } : TableMainContainerProps) {
   const searchParams = useSearchParams();
   const tableId = searchParams.get("tableid");
@@ -40,7 +57,7 @@ export default function TableMainContainer({ showFindBar, toggleFindBar } : Tabl
     }
 
     const rowids_: string[] = [];
-    const rows = data.map((rowWithColumns) => {
+    const rows = data.map((rowWithColumns : RowWithColumns) => {
       const rowData = {};
       rowids_.push(rowWithColumns.row.id);
       rowWithColumns.columns.forEach((column) => {
