@@ -22,7 +22,7 @@ export default function HomeSideBar({ session, isExpanded }: { session: Session;
 
     const expanded = isHovered || isExpanded;
 
-    const { mutate: createBase, isLoading, error } = api.base.create.useMutation({
+    const { mutate: createBase, error } = api.base.create.useMutation({
         // instead take him straight to the base
         onSuccess: () => {
           console.log("Base created successfully");
