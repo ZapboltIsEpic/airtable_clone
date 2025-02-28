@@ -8,8 +8,7 @@ import { api } from '~/trpc/react';
 
 export default function BasePage() {
     const searchParams = useSearchParams();
-    const id = searchParams.get('baseid')?.replace(/^"|"$/g, '');
-    console.log(id);
+    const id = searchParams.get('baseid')?.replace(/^"|"$/g, '') ?? "";
 
     useEffect(() => {
         const storedSession = localStorage.getItem("sb-xasktggrrutkhavrsexk-auth-token");
@@ -30,7 +29,7 @@ export default function BasePage() {
     const [session, setSession] = useState<Session | null>(null);
 
     const { data: base, isLoading, error } = api.base.getSpecificBase.useQuery(
-        { id: id as UUID }, 
+        { id: id }, 
         { enabled: !!id} 
     );
 
