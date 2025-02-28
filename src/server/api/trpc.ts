@@ -12,7 +12,7 @@ import superjson from "superjson";
 import { ZodError } from "zod";
 import { SupabaseClient } from "@supabase/supabase-js";
 
-import { auth } from "~/server/auth";
+// import { auth } from "~/server/auth";
 import { db } from "~/server/db";
 
 /**
@@ -28,11 +28,11 @@ import { db } from "~/server/db";
  * @see https://trpc.io/docs/server/context
  */
 export const createTRPCContext = async (opts: { headers: Headers; supabase: SupabaseClient<any, "public", any>; }) => {
-  const session = await auth();
+  // const session = await auth();
 
   return {
     db,
-    session,
+    // session,
     supabase: opts.supabase,
     headers: opts.headers,
   };
@@ -120,16 +120,17 @@ export const publicProcedure = t.procedure.use(timingMiddleware);
  *
  * @see https://trpc.io/docs/procedures
  */
-export const protectedProcedure = t.procedure
-  .use(timingMiddleware)
-  .use(({ ctx, next }) => {
-    if (!ctx.session || !ctx.session.user) {
-      throw new TRPCError({ code: "UNAUTHORIZED" });
-    }
-    return next({
-      ctx: {
-        // infers the `session` as non-nullable
-        session: { ...ctx.session, user: ctx.session.user },
-      },
-    });
-  });
+
+// export const protectedProcedure = t.procedure
+//   .use(timingMiddleware)
+//   .use(({ ctx, next }) => {
+//     if (!ctx.session || !ctx.session.user) {
+//       throw new TRPCError({ code: "UNAUTHORIZED" });
+//     }
+//     return next({
+//       ctx: {
+//         // infers the `session` as non-nullable
+//         session: { ...ctx.session, user: ctx.session.user },
+//       },
+//     });
+//   });
