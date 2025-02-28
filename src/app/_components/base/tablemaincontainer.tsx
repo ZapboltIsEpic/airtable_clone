@@ -86,7 +86,7 @@ export default function TableMainContainer({ showFindBar, toggleFindBar } : Tabl
         const onBlur = () => {
           if (value !== initialValue) {
             mutation.mutate({
-              rowid: rowids_[row.index],
+              rowid: rowids_[row.index] ?? "",
               columncontent: value,
               fieldname: column.id,
             });
