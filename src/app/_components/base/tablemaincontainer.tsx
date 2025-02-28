@@ -16,16 +16,16 @@ interface TableMainContainerProps {
 type RowWithColumns = {
   row: {
     id: string;
-    tableId: string;
-    createdAt: Date;
-    updatedAt: Date;
-    numberedId: number;
+    tableid: string;
+    createdat: Date;
+    updatedat: Date;
+    numberedid: number;
   };
   columns: {
     id: string;
     rowid: string;
-    createdAt: Date;
-    updatedAt: Date;
+    createdat: Date;
+    updatedat: Date;
     fieldname: string;
     columncontent: string;
   }[]
@@ -54,7 +54,7 @@ export default function TableMainContainer({ showFindBar, toggleFindBar } : Tabl
     { enabled: !!tableId } 
   );
 
-  const typedData = data as RowWithColumns[];
+  const typedData = data as unknown as RowWithColumns[];
 
   const mutation = api.column.updateColContent.useMutation();
 
