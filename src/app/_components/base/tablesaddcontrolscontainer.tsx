@@ -9,18 +9,13 @@ import { useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Table } from "@prisma/client";
 
-interface TableData {
-    name: string;
-    baseid: string;
-}
-
 export default function TablesAddControlsContainer({base} : { base : Base}) {
     const router = useRouter();
     const searchParams = useSearchParams();
     const pathname = usePathname();
     const queryClient = useQueryClient();
 
-    const [tablesData, setTablesData] = useState<TableData[]>([]);
+    const [tablesData, setTablesData] = useState<Table[]>([]);
 
     const { data: tables, isLoading, error } = api.table.getAllTables.useQuery(
         { baseid: base?.id }, 
@@ -84,7 +79,7 @@ export default function TablesAddControlsContainer({base} : { base : Base}) {
                     <div className="absolute all-0 pl-3">
                         <div className="flex flex-auto pt-1 -mt-1 pl-1 -ml-1">
                             <nav className="flex flex-none">   
-                                {isLoading ? <p>Loading tables...</p> : tablesData?.length > 0 && tablesData.map((table : Table) => (
+                                {isLoading ? <p>Loading tables...</p> : tableCount > 0 && tablesData.map((table : Table) => (
                                     <div key={table.id}>
                                         <TableTab key={table.id} table={table} />
                                     </div>
