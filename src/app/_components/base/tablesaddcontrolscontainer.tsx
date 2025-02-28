@@ -17,7 +17,7 @@ export default function TablesAddControlsContainer({base} : { base : Base}) {
     const [tablesData, setTablesData] = useState([]);
 
     const { data: tables, isLoading, error } = api.table.getAllTables.useQuery(
-        { baseid: base?.id as UUID }, 
+        { baseid: base?.id }, 
         { enabled: !!base?.id }
     );
 
