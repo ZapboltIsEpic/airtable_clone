@@ -50,7 +50,7 @@ export default function TablesAddControlsContainer({base} : { base : Base}) {
             return { previousTablesData };
         },
         
-        onError: (error, newColumn, context) => {
+        onError: (error, context) => {
             console.error('Error creating table:', error);
             if (context?.previousTablesData) {
                 setTablesData(context.previousTablesData);
