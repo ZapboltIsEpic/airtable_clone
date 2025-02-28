@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { QueryClient, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
+import { CellContext, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import Image from "next/image";
 import { api } from "~/trpc/react"; 
 import FindBarContainer from "./findbarcontainer";
@@ -79,7 +79,7 @@ export default function TableMainContainer({ showFindBar, toggleFindBar } : Tabl
     const tableColumns = Array.from(fieldNames_).map((fieldname) => ({
       header: fieldname,
       accessorKey: fieldname,
-      cell: ({ getValue, row, column }) => {
+      cell: ({ getValue, row, column }: CellContext<any, any>) => {
         const initialValue = getValue();
         const [value, setValue] = useState(initialValue);
   
