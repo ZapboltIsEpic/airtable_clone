@@ -29,7 +29,7 @@ model Base {
   name      String   @unique
   workspace String
   userid    String
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userid], references: [id])
   createdat DateTime @default(now())
   updatedat DateTime @updatedAt
 
@@ -42,10 +42,10 @@ model Table {
   id         String   @id @default(uuid())
   name       String   @unique
   baseid     String
-  base       Base     @relation(fields: [baseId], references: [id])
+  base       Base     @relation(fields: [baseid], references: [id])
   createdat  DateTime @default(now())
   updatedat  DateTime @updatedAt
-  numberedId Int      @unique @default(autoincrement())
+  numberedid Int      @unique @default(autoincrement())
 
   rows Row[]
 
@@ -54,11 +54,11 @@ model Table {
 
 model Row {
   id         String   @id @default(uuid())
-  tableId    String
-  table      Table    @relation(fields: [tableId], references: [id])
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  numberedId Int      @unique @default(autoincrement())
+  tableid    String
+  table      Table    @relation(fields: [tableid], references: [id])
+  createdat  DateTime @default(now())
+  updatedat  DateTime @updatedAt
+  numberedid Int      @unique @default(autoincrement())
 
   columns Column[]
 
@@ -67,13 +67,13 @@ model Row {
 
 model Column {
   id            String   @id @default(uuid())
-  fieldName     String   @unique
-  columnContent String
-  rowId         String
-  row           Row      @relation(fields: [rowId], references: [id])
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  numberedId    Int      @unique @default(autoincrement())
+  fieldname     String   @unique
+  columncontent String
+  rowid         String
+  row           Row      @relation(fields: [rowid], references: [id])
+  createdat     DateTime @default(now())
+  updatedat     DateTime @updatedAt
+  numberedid    Int      @unique @default(autoincrement())
 
   @@schema("auth")
 }
