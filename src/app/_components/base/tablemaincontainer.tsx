@@ -40,7 +40,7 @@ export default function TableMainContainer({ showFindBar, toggleFindBar } : Tabl
   const searchParams = useSearchParams();
   const tableId = searchParams.get("tableid");
 
-  const [tableData, setTableData] = useState([]);
+  const [tableData, setTableData] = useState<Record<string, any>[]>([]);
   const [columns, setColumns] = useState<TableColumn[]>([]);;
   const [rowids, setRowIds] = useState<string[]>([]);
   const [fieldnames, setFieldNames] = useState<string[]>([]);
