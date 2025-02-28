@@ -26,7 +26,8 @@ type RowWithColumns = {
     rowid: string;
     createdAt: Date;
     updatedAt: Date;
-    
+    fieldname: string;
+    columncontent: string;
   }[]
 };
 
@@ -183,7 +184,7 @@ export default function TableMainContainer({ showFindBar, toggleFindBar } : Tabl
   
     onMutate: async (newRow) => {
       const previousTableData = [...tableData];
-      const newRowData = newRow.fieldnames.reduce((acc: { [key: string]: string }, fieldname) => {
+      const newRowData = newRow.fieldnames.reduce((acc: Record<string, string>, fieldname) => {
         acc[fieldname] = "";
         return acc;
       }, {});

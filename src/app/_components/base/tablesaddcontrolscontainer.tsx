@@ -3,11 +3,10 @@
 import Image from "next/image";
 import { api } from "~/trpc/react"; 
 import TableTab from "./tabletab";
-import { Base } from "@prisma/client";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Table } from "@prisma/client";
+import type { Table, Base } from "@prisma/client";
 
 export default function TablesAddControlsContainer({base} : { base : Base}) {
     const router = useRouter();
@@ -17,7 +16,7 @@ export default function TablesAddControlsContainer({base} : { base : Base}) {
 
     const [tablesData, setTablesData] = useState<Table[]>([]);
 
-    const { data: tables, isLoading, error } = api.table.getAllTables.useQuery(
+    const { data: tables, isLoading} = api.table.getAllTables.useQuery(
         { baseid: base?.id }, 
         { enabled: !!base?.id }
     );
@@ -40,10 +39,10 @@ export default function TablesAddControlsContainer({base} : { base : Base}) {
             const newTableData = {
                 name: newTable.name,
                 id: `temp-${tablesData.length + 1}`,
-                createdat: new Date(),
-                updatedat: new Date(),
-                baseid: newTable.baseid, 
-                numberedid: tablesData.length + 1,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                baseId: newTable.baseid, 
+                numberedId: tablesData.length + 1,
             }
             const newTablesData = [...tablesData, newTableData];
             setTablesData(newTablesData); 
@@ -62,7 +61,7 @@ export default function TablesAddControlsContainer({base} : { base : Base}) {
         
         onSettled: () => {
             // rather than tableData probs have to put back in current format... but that is kinda pain in the ass.
-            queryClient.invalidateQueries({ queryKey: ["tablesData"] }); 
+            // queryClient.invalidateQueries({ queryKey: ["tablesData"] }); 
         }
     })
 
