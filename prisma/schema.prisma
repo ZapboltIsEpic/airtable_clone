@@ -28,10 +28,10 @@ model Base {
   id        String   @id @default(uuid())
   name      String   @unique
   workspace String
-  userId    String
+  userid    String
   user      User     @relation(fields: [userId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdat DateTime @default(now())
+  updatedat DateTime @updatedAt
 
   tables Table[]
 
@@ -41,10 +41,10 @@ model Base {
 model Table {
   id         String   @id @default(uuid())
   name       String   @unique
-  baseId     String
+  baseid     String
   base       Base     @relation(fields: [baseId], references: [id])
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  createdat  DateTime @default(now())
+  updatedat  DateTime @updatedAt
   numberedId Int      @unique @default(autoincrement())
 
   rows Row[]

@@ -39,7 +39,11 @@ export default function TablesAddControlsContainer({base} : { base : Base}) {
         
             const newTableData = {
                 name: newTable.name,
-                baseid: newTable.baseid,
+                id: `temp-${tablesData.length + 1}`,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                baseId: newTable.baseid, 
+                numberedId: tablesData.length + 1,
             }
             const newTablesData = [...tablesData, newTableData];
             setTablesData(newTablesData); 
