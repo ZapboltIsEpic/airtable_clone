@@ -43,11 +43,12 @@ export const authConfig = {
         email: { label: "Email", type: "email", placeholder: "user@example.com" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials : { email?: string; password: string }) {
-        if (!credentials?.email || !credentials?.password) return null;
+      async authorize(credentials: Partial<Record<"email" | "password", unknown>>) {
+        const { email, password } = credentials as { email?: string; password: string };
+        if (!email || !password) return null;
 
         const user = await db.user.findUnique({
-          where: { email: credentials.email },
+          where: { email: credentials.email as string },
         });
 
         if (!user) throw new Error("No user found");
