@@ -7,6 +7,7 @@ import { Base } from "@prisma/client";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Table } from "@prisma/client";
 
 interface TableData {
     name: string;
@@ -83,7 +84,7 @@ export default function TablesAddControlsContainer({base} : { base : Base}) {
                     <div className="absolute all-0 pl-3">
                         <div className="flex flex-auto pt-1 -mt-1 pl-1 -ml-1">
                             <nav className="flex flex-none">   
-                                {isLoading ? <p>Loading tables...</p> : tables?.length > 0 && tables.map((table) => (
+                                {isLoading ? <p>Loading tables...</p> : tables?.length > 0 && tables.map((table : Table) => (
                                     <div key={table.id}>
                                         <TableTab key={table.id} table={table} />
                                     </div>
