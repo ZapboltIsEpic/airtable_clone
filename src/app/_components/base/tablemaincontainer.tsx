@@ -42,7 +42,7 @@ export default function TableMainContainer({ showFindBar, toggleFindBar } : Tabl
 
   const [tableData, setTableData] = useState([]);
   const [columns, setColumns] = useState<TableColumn[]>([]);;
-  const [rowids, setRowIds] = useState([]);
+  const [rowids, setRowIds] = useState<string[]>([]);
   const [fieldnames, setFieldNames] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
 
