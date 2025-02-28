@@ -5,6 +5,7 @@ import { redirect, useRouter, useSearchParams } from 'next/navigation';
 import BaseNavBar from '../_components/base/basenavbar'
 import BaseMainContent from '../_components/base/basemaincontent';
 import { api } from '~/trpc/react';
+import { Base } from '@prisma/client';
 
 export default function BasePage() {
     const searchParams = useSearchParams();
@@ -41,8 +42,8 @@ export default function BasePage() {
 
     return (
         <div>
-            <BaseNavBar base={base[0]}/>
-            <BaseMainContent base={base[0]}/>
+            <BaseNavBar base={base?.[0]}/>
+            <BaseMainContent base={base?.[0]}/>
         </div>
     )
 }
