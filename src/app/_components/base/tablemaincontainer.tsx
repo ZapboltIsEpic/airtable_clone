@@ -171,7 +171,7 @@ export default function TableMainContainer({ showFindBar, toggleFindBar } : Tabl
   
     onSettled: () => {
       // rather than tableData probs have to put back in current format... but that is kinda pain in the ass.
-      queryClient.invalidateQueries('tableData'); 
+      queryClient.invalidateQueries({ queryKey: ["tableData"] }); 
     }
   })
 
@@ -206,7 +206,7 @@ export default function TableMainContainer({ showFindBar, toggleFindBar } : Tabl
     },
   
     onSettled: () => {
-      queryClient.invalidateQueries('tableData'); 
+      queryClient.invalidateQueries({ queryKey: ["tableData"] }); 
     }
   })
 
