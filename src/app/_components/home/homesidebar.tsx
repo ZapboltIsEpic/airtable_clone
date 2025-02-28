@@ -6,7 +6,12 @@ import { useState } from "react";
 // import CreateBasePopUp from "createbasepopup";
 import { api } from "~/trpc/react";
 // import { useRouter } from "next/router";
-import { Session } from '@prisma/client';
+
+interface Session {
+    user: {
+        id: string;
+    };
+}
 
 export default function HomeSideBar({ session, isExpanded }: { session: Session; isExpanded: boolean }) {
 
@@ -116,7 +121,7 @@ export default function HomeSideBar({ session, isExpanded }: { session: Session;
                                         createBase({
                                             name: "Untitled Base",
                                             workspace: "Default Workspace",
-                                            userId: session?.userId ?? "",
+                                            userId: session?.user?.id ?? "",
                                         });
                                     }} 
                                     className="flex pointer-events-auto items-center justify-center 

@@ -6,13 +6,13 @@ import HomeNavBar from "../_components/home/homenavbar";
 import HomeSideBar from "../_components/home/homesidebar";
 import { useEffect, useState } from "react";
 
-export default function HomePage() {
-    interface Session {
-        user: {
-            id: string;
-        };
-    }
+interface Session {
+    user: {
+        id: string;
+    };
+}
 
+export default function HomePage() {
     const [session, setSession] = useState<Session | null>(null);
 
     useEffect(() => {
@@ -34,8 +34,8 @@ export default function HomePage() {
         <div>
             <HomeNavBar toggleSideBar={toggleSideBar}></HomeNavBar>
             <div className="flex flex-auto">
-                <HomeSideBar session={session} isExpanded={isSideBarExpanded}></HomeSideBar>
-                <HomeMainContent session={session}/>
+                {session && <HomeSideBar session={session} isExpanded={isSideBarExpanded}></HomeSideBar>}
+                {session && <HomeMainContent session={session}/>}
             </div>
         </div>
     );
