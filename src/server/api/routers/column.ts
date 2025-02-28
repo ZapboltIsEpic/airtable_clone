@@ -1,5 +1,5 @@
-import { contextProps } from "@trpc/react-query/shared";
-import { SupabaseClient } from '@supabase/supabase-js';
+// import { contextProps } from "@trpc/react-query/shared";
+// import { SupabaseClient } from '@supabase/supabase-js';
 import { z } from "zod";
 
 import {
@@ -7,6 +7,8 @@ import {
   // protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
+
+import type { Column } from "@prisma/client";
 
 export const columnRouter = createTRPCRouter({
 
@@ -23,7 +25,7 @@ export const columnRouter = createTRPCRouter({
           throw new Error(error.message);
         }
 
-        return data;
+        return data as Column[];
     }),
 
   
@@ -83,6 +85,6 @@ export const columnRouter = createTRPCRouter({
       throw new Error(error.message);
     }
 
-    return data;
+    return data as Column[];
     }),
 });

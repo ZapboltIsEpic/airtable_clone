@@ -1,5 +1,5 @@
-import { contextProps } from "@trpc/react-query/shared";
-import { SupabaseClient } from '@supabase/supabase-js';
+// import { contextProps } from "@trpc/react-query/shared";
+// import { SupabaseClient } from '@supabase/supabase-js';
 import { z } from "zod";
 
 import {
@@ -7,6 +7,8 @@ import {
   // protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
+
+import type { Row } from "@prisma/client";
 
 export const rowRouter = createTRPCRouter({
   getAllRowsByTableId: publicProcedure
@@ -22,7 +24,7 @@ export const rowRouter = createTRPCRouter({
           throw new Error(error.message);
         }
 
-        return data;
+        return data as Row[];
     }),
 
   createNewRow: publicProcedure
@@ -38,21 +40,31 @@ export const rowRouter = createTRPCRouter({
       .insert([{ tableid: input.tableid }])
       .select("*");
 
+    const typedData = data as Row[];
+
     if (error) {
       throw new Error(error.message);
     }
 
-    for (const fieldname of input.fieldnames) {
-      const { error: colError } = await ctx.supabase
-        .schema('public')
-        .from('columns')
-        .insert([{ rowid : data[0].id, fieldname: fieldname, columncontent: ""}])
-      
-      if (colError) {
-        throw new Error(colError.message);
+    if (typedData && typedData.length > 0) {
+      for (const fieldname of input.fieldnames) {
+        const { error: colError } = await ctx.supabase
+          .schema('public')
+          .from('columns')
+          .insert([{ rowid : typedData[0]?.id, fieldname: fieldname, columncontent: ""}])
+        
+        if (colError) {
+          throw new Error(colError.message);
+        }
       }
     }
 
-    return data;
+    const { data : newData } = await ctx.supabase
+      .schema('public')
+      .from('rows')
+      .insert([{ tableid: input.tableid }])
+      .select("*");
+
+    return newData as Row[];
     }),
 });

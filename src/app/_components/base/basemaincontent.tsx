@@ -1,6 +1,6 @@
 'use client';
 
-import { Base } from "@prisma/client";
+import type { Base } from "@prisma/client";
 import TableContainer from "./tablecontainer";
 import TablesAddControlsContainer from "./tablesaddcontrolscontainer";
 

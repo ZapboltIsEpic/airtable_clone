@@ -1,5 +1,5 @@
-import { contextProps } from "@trpc/react-query/shared";
-import { SupabaseClient } from '@supabase/supabase-js';
+// import { contextProps } from "@trpc/react-query/shared";
+// import { SupabaseClient } from '@supabase/supabase-js';
 import { z } from "zod";
 
 import {
@@ -7,6 +7,8 @@ import {
   // protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
+
+import type { Table, Row } from "@prisma/client";
 
 export const tableRouter = createTRPCRouter({
 
@@ -23,7 +25,7 @@ export const tableRouter = createTRPCRouter({
         throw new Error(error.message);
       }
 
-      return data;
+      return data as Table[];
     }),
 
     getTableRowsAndColumns: publicProcedure
@@ -41,7 +43,7 @@ export const tableRouter = createTRPCRouter({
         }
     
         // Fetch columns for each row
-        const columnsPromises = rows.map(async (row) => {
+        const columnsPromises = rows.map(async (row : Row) => {
           const { data: columns, error: columnError } = await ctx.supabase
             .schema('public')
             .from('columns')
@@ -81,7 +83,8 @@ export const tableRouter = createTRPCRouter({
       throw new Error(error.message);
     }
 
-    const tableId = data[0].id;
+    const typedData = data as Table[];
+    const tableId = typedData[0]?.id;
 
     for (let i = 0; i < 3; i++) {
       const { data: rowData, error: rowError } = await ctx.supabase
@@ -95,8 +98,9 @@ export const tableRouter = createTRPCRouter({
       if (!rowData || rowData.length === 0) {
         throw new Error(`No row data returned for row ${i + 1}`);
       }
-
-      const rowId = rowData[0].id as string;
+      
+      const typedRowData = rowData as Row[];
+      const rowId = typedRowData[0]?.id;
   
       if (rowError) {
           console.error(`Error inserting row ${i + 1}:`, rowError);
@@ -120,7 +124,7 @@ export const tableRouter = createTRPCRouter({
           fieldName = "Status";
         }
 
-        const { data: rowData, error: rowError } = await ctx.supabase
+        const {} = await ctx.supabase
         .schema('public')
         .from('columns')
         .insert([{ 
@@ -132,6 +136,12 @@ export const tableRouter = createTRPCRouter({
       }
     }
 
-    return data;
+    const { data: newData} = await ctx.supabase
+      .schema('public')
+      .from('tables')
+      .insert([{ name: input.name, baseid: input.baseid }])
+      .select("*");
+
+    return newData as Table[];
     }),
 });

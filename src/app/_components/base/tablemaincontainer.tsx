@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { QueryClient, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { CellContext, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { type CellContext, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import Image from "next/image";
 import { api } from "~/trpc/react"; 
 import FindBarContainer from "./findbarcontainer";
@@ -13,34 +13,34 @@ interface TableMainContainerProps {
   toggleFindBar: () => void;
 }
 
-interface RowWithColumns {
+type RowWithColumns = {
   row: {
     id: string;
-    tableid: string;
-    createdat: string | Date; // ISO string or Date object
-    updatedat: string | Date;
+    tableId: string;
+    createdAt: Date;
+    updatedAt: Date;
+    numberedId: number;
   };
   columns: {
     id: string;
-    fieldname: string;
-    columncontent: string;
     rowid: string;
-    createdat: string | Date;
-    updatedat: string | Date;
-  }[];
-}
+    createdAt: Date;
+    updatedAt: Date;
+    
+  }[]
+};
 
 interface TableColumn {
   header: string;
   accessorKey: string;
-  cell: ({ getValue, row, column }: CellContext<any, any>) => JSX.Element;
+  cell: ({ getValue, row, column }: CellContext<Record<string, string>, string>) => JSX.Element;
 }
 
 export default function TableMainContainer({ showFindBar, toggleFindBar } : TableMainContainerProps) {
   const searchParams = useSearchParams();
   const tableId = searchParams.get("tableid");
 
-  const [tableData, setTableData] = useState<Record<string, any>[]>([]);
+  const [tableData, setTableData] = useState<Record<string, string>[]>([]);
   const [columns, setColumns] = useState<TableColumn[]>([]);;
   const [rowids, setRowIds] = useState<string[]>([]);
   const [fieldnames, setFieldNames] = useState<string[]>([]);
@@ -48,10 +48,12 @@ export default function TableMainContainer({ showFindBar, toggleFindBar } : Tabl
 
   const queryClient = useQueryClient();
 
-  const { data, isLoading, error } = api.table.getTableRowsAndColumns.useQuery(
+  const { data, error } = api.table.getTableRowsAndColumns.useQuery(
     { tableid: tableId! }, 
     { enabled: !!tableId } 
   );
+
+  const mutation = api.column.updateColContent.useMutation();
 
   useEffect(() => {
     if (error || !data || data.length === 0) {
@@ -85,31 +87,30 @@ export default function TableMainContainer({ showFindBar, toggleFindBar } : Tabl
     const tableColumns: TableColumn[] = Array.from(fieldNames_).map((fieldname) => ({
       header: fieldname,
       accessorKey: fieldname,
-      cell: ({ getValue, row, column }: CellContext<any, any>) => {
+      cell: ({ getValue, row, column }: CellContext<Record<string, string>, string>) => {
         const initialValue = getValue();
-        const [value, setValue] = useState(initialValue);
   
         const onBlur = () => {
-          if (value !== initialValue) {
+          if (initialValue !== row.original[column.id]) {
             mutation.mutate({
               rowid: rowids_[row.index] ?? "",
-              columncontent: value,
+              columncontent: initialValue,
               fieldname: column.id,
             });
           }
-          row.original[column.id] = value;
+          row.original[column.id] = initialValue;
         };
 
         const isHighlighted =
           searchTerm != "" && 
-          value != "" && 
-          value.toLowerCase().includes(searchTerm.toLowerCase());
+          initialValue != "" && 
+          initialValue.toLowerCase().includes(searchTerm.toLowerCase());
 
         return (
           <div className={`w-[180px] h-[32px] flex items-center justify-center`}>
             <input
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
+              value={initialValue}
+              onChange={(e) => row.original[column.id] = e.target.value}
               onBlur={onBlur}
               className={`w-full h-full outline-none ${isHighlighted ? "bg-[rgb(255,243,211)]" : ""}`}
               data-highlighted={isHighlighted ? "true" : "false"}
@@ -123,7 +124,7 @@ export default function TableMainContainer({ showFindBar, toggleFindBar } : Tabl
     setTableData(rows);
     setColumns(tableColumns);
     setRowIds(rowids_);
-  }, [data, error, searchTerm]);
+  }, [data, error, mutation, searchTerm]);
 
   if (searchTerm) {
     const firstHighlightedElement = document.querySelector('[data-highlighted="true"]');
@@ -138,7 +139,6 @@ export default function TableMainContainer({ showFindBar, toggleFindBar } : Tabl
     getCoreRowModel: getCoreRowModel(),
   });
 
-  const mutation = api.column.updateColContent.useMutation();
   const { mutateAsync: createNewColApi } = api.column.createNewCol.useMutation();
   const { mutateAsync: createNewRowApi } = api.row.createNewRow.useMutation();
 
@@ -171,7 +171,7 @@ export default function TableMainContainer({ showFindBar, toggleFindBar } : Tabl
   
     onSettled: () => {
       // rather than tableData probs have to put back in current format... but that is kinda pain in the ass.
-      queryClient.invalidateQueries({ queryKey: ["tableData"] }); 
+      // queryClient.invalidateQueries({ queryKey: ["tableData"] }); 
     }
   })
 
@@ -206,7 +206,7 @@ export default function TableMainContainer({ showFindBar, toggleFindBar } : Tabl
     },
   
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["tableData"] }); 
+      // queryClient.invalidateQueries({ queryKey: ["tableData"] }); 
     }
   })
 
