@@ -11,7 +11,6 @@ import { columnRouter } from "./routers/column";
  * All routers added in /api/routers should be manually added here.
  */
 export const appRouter = createTRPCRouter({
-  post: postRouter,
   base: baseRouter,
   table: tableRouter,
   row: rowRouter,
