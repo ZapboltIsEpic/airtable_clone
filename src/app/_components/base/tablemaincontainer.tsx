@@ -30,12 +30,18 @@ interface RowWithColumns {
   }[];
 }
 
+interface TableColumn {
+  header: string;
+  accessorKey: string;
+  cell: ({ getValue, row, column }: CellContext<any, any>) => JSX.Element;
+}
+
 export default function TableMainContainer({ showFindBar, toggleFindBar } : TableMainContainerProps) {
   const searchParams = useSearchParams();
   const tableId = searchParams.get("tableid");
 
   const [tableData, setTableData] = useState([]);
-  const [columns, setColumns] = useState([]);
+  const [columns, setColumns] = useState<TableColumn[]>([]);;
   const [rowids, setRowIds] = useState([]);
   const [fieldnames, setFieldNames] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -76,7 +82,7 @@ export default function TableMainContainer({ showFindBar, toggleFindBar } : Tabl
     setFieldNames([...fieldNames_]);
 
     
-    const tableColumns = Array.from(fieldNames_).map((fieldname) => ({
+    const tableColumns: TableColumn[] = Array.from(fieldNames_).map((fieldname) => ({
       header: fieldname,
       accessorKey: fieldname,
       cell: ({ getValue, row, column }: CellContext<any, any>) => {
