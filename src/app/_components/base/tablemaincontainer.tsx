@@ -254,7 +254,7 @@ export default function TableMainContainer({ showFindBar, toggleFindBar } : Tabl
                 <td className="border border-gray-300 text-xs font-normal p-0 w-[180px] h-[32px]">
                   <button onClick={() => {
                       createNewRow({
-                        tableid: tableId,
+                        tableid: tableId ?? "",
                         fieldnames: fieldnames,
                       });
                   }}>
