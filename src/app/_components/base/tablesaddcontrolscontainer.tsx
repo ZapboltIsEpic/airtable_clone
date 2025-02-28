@@ -28,7 +28,7 @@ export default function TablesAddControlsContainer({base} : { base : Base}) {
     const { mutateAsync: createNewTableApi } = api.table.create.useMutation();
 
     const { mutate : createTable, } = useMutation({
-        mutationFn: async (newTable) => {
+        mutationFn: async (newTable: { name: string; baseid: string }) => {
             const response = await createNewTableApi(newTable); 
             return response; 
         },
