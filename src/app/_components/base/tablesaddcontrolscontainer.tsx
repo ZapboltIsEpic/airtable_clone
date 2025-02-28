@@ -12,7 +12,7 @@ export default function TablesAddControlsContainer({base} : { base : Base}) {
     const router = useRouter();
     const searchParams = useSearchParams();
     const pathname = usePathname();
-    const queryClient = useQueryClient();
+    // const queryClient = useQueryClient();
 
     const [tablesData, setTablesData] = useState<Table[]>([]);
 
