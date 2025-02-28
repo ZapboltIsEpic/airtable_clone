@@ -37,7 +37,7 @@ export default function TableMainContainer({ showFindBar, toggleFindBar } : Tabl
   const [tableData, setTableData] = useState([]);
   const [columns, setColumns] = useState([]);
   const [rowids, setRowIds] = useState([]);
-  const [fieldnames, setFieldNames] = useState([]);
+  const [fieldnames, setFieldNames] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
 
   const queryClient = useQueryClient();
@@ -67,7 +67,7 @@ export default function TableMainContainer({ showFindBar, toggleFindBar } : Tabl
     });
 
     // Extract unique fieldnames for columns
-    const fieldNames_ = new Set();
+    const fieldNames_ = new Set<string>();
     data.forEach((rowWithColumns : RowWithColumns) => {
       rowWithColumns.columns.forEach((col) => {
         fieldNames_.add(col.fieldname);
