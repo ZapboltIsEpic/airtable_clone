@@ -43,7 +43,7 @@ export const authConfig = {
         email: { label: "Email", type: "email", placeholder: "user@example.com" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials) {
+      async authorize(credentials : { email?: string; password: string }) {
         if (!credentials?.email || !credentials?.password) return null;
 
         const user = await db.user.findUnique({
