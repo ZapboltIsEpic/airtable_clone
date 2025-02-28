@@ -116,7 +116,7 @@ export default function HomeSideBar({ session, isExpanded }: { session: Session;
                                         createBase({
                                             name: "Untitled Base",
                                             workspace: "Default Workspace",
-                                            userId: session?.user?.id ?? "",
+                                            userId: session?.userId ?? "",
                                         });
                                     }} 
                                     className="flex pointer-events-auto items-center justify-center 
