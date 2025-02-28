@@ -6,6 +6,7 @@ import Image from "next/image"
 import TableCreationWayFlexBox from "../tablecreationwayflexbox"
 import BaseListItem from "./baselistitem";
 import { Session } from '@prisma/client';
+import { Base } from "@prisma/client";
 
 export default function HomeMainContent({ session }: { session: Session }) {
     const { data: bases, isLoading, error } = api.base.get.useQuery(
@@ -106,7 +107,7 @@ export default function HomeMainContent({ session }: { session: Session }) {
                                     ) : (
                                         <>
                                             {bases && bases.length > 0 ? (
-                                                bases.map((base) => (
+                                                bases.map((base : Base) => (
                                                     <div key={base.id} className="w-full">
                                                         <BaseListItem key={base.id} base={base} />
                                                     </div>
