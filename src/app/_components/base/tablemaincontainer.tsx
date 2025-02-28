@@ -143,7 +143,7 @@ export default function TableMainContainer({ showFindBar, toggleFindBar } : Tabl
   const { mutateAsync: createNewRowApi } = api.row.createNewRow.useMutation();
 
   const { mutate : createNewCol, } = useMutation({
-    mutationFn: async (newColumn) => {
+    mutationFn: async (newColumn: { rowids: string[]; fieldname: string }) => {
       // Call your API or mutation logic
       const response = await createNewColApi(newColumn); 
       return response; // Ensure this returns the necessary data
