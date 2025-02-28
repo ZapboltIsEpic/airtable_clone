@@ -183,8 +183,8 @@ export default function TableMainContainer({ showFindBar, toggleFindBar } : Tabl
   
     onMutate: async (newRow) => {
       const previousTableData = [...tableData];
-      const newRowData = newRow.fieldnames.reduce((acc, fieldname) => {
-        acc[fieldname] = ""; 
+      const newRowData = newRow.fieldnames.reduce((acc: { [key: string]: string }, fieldname) => {
+        acc[fieldname] = "";
         return acc;
       }, {});
 
