@@ -28,7 +28,7 @@ export default function TablesAddControlsContainer({base} : { base : Base}) {
     );
 
     useEffect(() => {
-        setTablesData(tables);
+        setTablesData(tables ?? []);
     }, [tables]);
 
     const { mutateAsync: createNewTableApi } = api.table.create.useMutation();
