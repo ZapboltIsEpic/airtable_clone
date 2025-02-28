@@ -92,7 +92,11 @@ export const tableRouter = createTRPCRouter({
         }])
         .select("*");
 
-      const rowId = rowData[0].id;
+      if (!rowData || rowData.length === 0) {
+        throw new Error(`No row data returned for row ${i + 1}`);
+      }
+
+      const rowId = rowData[0].id as string;
   
       if (rowError) {
           console.error(`Error inserting row ${i + 1}:`, rowError);
