@@ -58,13 +58,13 @@ export const authConfig = {
     }),
   ],
   callbacks: {
-    session: ({ session, user }) => ({
-      ...session,
-      user: {
-        ...session.user,
-        id: user.id,
-      },
-    }),
+    // session: ({ session, user }) => ({
+    //   ...session,
+    //   user: {
+    //     ...session.user,
+    //     id: user.id,
+    //   },
+    // }),
   },
   session: {
     strategy: "database", // This is optional but helps make it clear that you want to store sessions in the database.
