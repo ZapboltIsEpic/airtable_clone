@@ -144,9 +144,8 @@ export default function TableMainContainer({ showFindBar, toggleFindBar } : Tabl
 
   const { mutate : createNewCol, } = useMutation({
     mutationFn: async (newColumn: { rowids: string[]; fieldname: string }) => {
-      // Call your API or mutation logic
       const response = await createNewColApi(newColumn); 
-      return response; // Ensure this returns the necessary data
+      return response;
     },
   
     onMutate: async (newColumn) => {
@@ -164,8 +163,9 @@ export default function TableMainContainer({ showFindBar, toggleFindBar } : Tabl
   
     onError: (error, newColumn, context) => {
       console.error('Error creating column:', error);
-      setTableData(context.previousTableData);  
-  
+      if (context?.previousTableData) {
+        setTableData(context.previousTableData);
+      }
       // queryClient.setQueryData('tableData', context.previousTableData);
     },
   
@@ -176,7 +176,7 @@ export default function TableMainContainer({ showFindBar, toggleFindBar } : Tabl
   })
 
   const { mutate : createNewRow, } = useMutation({
-    mutationFn: async (newRow) => {
+    mutationFn: async (newRow : { tableid: string; fieldnames: string[] }) => {
       const response = await createNewRowApi(newRow); 
       return response; 
     },
@@ -198,7 +198,9 @@ export default function TableMainContainer({ showFindBar, toggleFindBar } : Tabl
   
     onError: (error, newColumn, context) => {
       console.error('Error creating row:', error);
-      setTableData(context.previousTableData);  
+      if (context?.previousTableData) {
+        setTableData(context.previousTableData);
+      } 
   
       // queryClient.setQueryData('tableData', context.previousTableData);
     },
