@@ -5,13 +5,18 @@ import { api } from "~/trpc/react";
 import Image from "next/image"
 import TableCreationWayFlexBox from "../tablecreationwayflexbox"
 import BaseListItem from "./baselistitem";
-import { Session } from '@prisma/client';
 import { Base } from "@prisma/client";
+
+interface Session {
+    user: {
+        id: string;
+    };
+}
 
 export default function HomeMainContent({ session }: { session: Session }) {
     const { data: bases, isLoading, error } = api.base.get.useQuery(
-        { userId: session.userId }, 
-        { enabled: !!session?.userId } 
+        { userId: session.user.id }, 
+        { enabled: !!session?.user?.id } 
     );
     console.log(bases);
 
