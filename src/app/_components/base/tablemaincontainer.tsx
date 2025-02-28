@@ -47,12 +47,14 @@ export default function TableMainContainer({ showFindBar, toggleFindBar } : Tabl
   const [fieldnames, setFieldNames] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
 
-  const queryClient = useQueryClient();
+  // const queryClient = useQueryClient();
 
   const { data, error } = api.table.getTableRowsAndColumns.useQuery(
     { tableid: tableId! }, 
     { enabled: !!tableId } 
   );
+
+  const typedData = data as RowWithColumns[];
 
   const mutation = api.column.updateColContent.useMutation();
 
@@ -66,7 +68,7 @@ export default function TableMainContainer({ showFindBar, toggleFindBar } : Tabl
     }
 
     const rowids_: string[] = [];
-    const rows = data.map((rowWithColumns : RowWithColumns) => {
+    const rows = typedData.map((rowWithColumns : RowWithColumns) => {
       const rowData: Record<string, string> = {};
       rowids_.push(rowWithColumns.row.id);
       rowWithColumns.columns.forEach((column) => {
@@ -77,7 +79,7 @@ export default function TableMainContainer({ showFindBar, toggleFindBar } : Tabl
 
     // Extract unique fieldnames for columns
     const fieldNames_ = new Set<string>();
-    data.forEach((rowWithColumns : RowWithColumns) => {
+    typedData.forEach((rowWithColumns : RowWithColumns) => {
       rowWithColumns.columns.forEach((col) => {
         fieldNames_.add(col.fieldname);
       });
@@ -125,7 +127,7 @@ export default function TableMainContainer({ showFindBar, toggleFindBar } : Tabl
     setTableData(rows);
     setColumns(tableColumns);
     setRowIds(rowids_);
-  }, [data, error, mutation, searchTerm]);
+  }, [data, typedData, error, mutation, searchTerm]);
 
   if (searchTerm) {
     const firstHighlightedElement = document.querySelector('[data-highlighted="true"]');

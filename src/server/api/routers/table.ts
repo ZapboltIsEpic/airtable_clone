@@ -28,7 +28,7 @@ export const tableRouter = createTRPCRouter({
       return data as Table[];
     }),
 
-    getTableRowsAndColumns: publicProcedure
+  getTableRowsAndColumns: publicProcedure
     .input(z.object({ tableid: z.string().uuid() }))
     .query(async ({ input, ctx }) => {
       try {
