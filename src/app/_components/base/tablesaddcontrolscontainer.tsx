@@ -53,14 +53,16 @@ export default function TablesAddControlsContainer({base} : { base : Base}) {
         
         onError: (error, newColumn, context) => {
             console.error('Error creating table:', error);
-            setTablesData(context.previousTablesData);  
+            if (context?.previousTablesData) {
+                setTablesData(context.previousTablesData);
+            }  
         
             // queryClient.setQueryData('tableData', context.previousTableData);
         },
         
         onSettled: () => {
             // rather than tableData probs have to put back in current format... but that is kinda pain in the ass.
-            queryClient.invalidateQueries('tablesData'); 
+            queryClient.invalidateQueries({ queryKey: ["tablesData"] }); 
         }
     })
 
