@@ -9,8 +9,8 @@ import { Session } from '@prisma/client';
 
 export default function HomeMainContent({ session }: { session: Session }) {
     const { data: bases, isLoading, error } = api.base.get.useQuery(
-        { userId: session?.user?.id ?? "" }, 
-        { enabled: !!session?.user?.id } 
+        { userId: session.userId }, 
+        { enabled: !!session?.userId } 
     );
     console.log(bases);
 
