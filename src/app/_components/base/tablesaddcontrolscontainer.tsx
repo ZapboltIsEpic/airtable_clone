@@ -8,13 +8,18 @@ import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
+interface TableData {
+    name: string;
+    baseid: string;
+}
+
 export default function TablesAddControlsContainer({base} : { base : Base}) {
     const router = useRouter();
     const searchParams = useSearchParams();
     const pathname = usePathname();
     const queryClient = useQueryClient();
 
-    const [tablesData, setTablesData] = useState([]);
+    const [tablesData, setTablesData] = useState<TableData[]>([]);
 
     const { data: tables, isLoading, error } = api.table.getAllTables.useQuery(
         { baseid: base?.id }, 
