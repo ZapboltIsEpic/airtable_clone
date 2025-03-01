@@ -39,10 +39,10 @@ export default function TablesAddControlsContainer({base} : { base : Base}) {
             const newTableData = {
                 name: newTable.name,
                 id: `temp-${tablesData.length + 1}`,
-                createdAt: new Date(),
-                updatedAt: new Date(),
-                baseId: newTable.baseid, 
-                numberedId: tablesData.length + 1,
+                createdat: new Date(),
+                updatedat: new Date(),
+                baseid: newTable.baseid, 
+                numberedid: tablesData.length + 1,
             }
             const newTablesData = [...tablesData, newTableData];
             setTablesData(newTablesData); 
@@ -52,8 +52,8 @@ export default function TablesAddControlsContainer({base} : { base : Base}) {
         
         onError: (error, context) => {
             console.error('Error creating table:', error);
-            if (context?.previousTablesData) {
-                setTablesData(context.previousTablesData);
+            if (context) {
+                setTablesData(context as unknown as Table[]);
             }  
         
             // queryClient.setQueryData('tableData', context.previousTableData);
