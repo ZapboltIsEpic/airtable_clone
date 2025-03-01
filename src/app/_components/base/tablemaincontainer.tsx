@@ -8,6 +8,25 @@ import Image from "next/image";
 import { api } from "~/trpc/react"; 
 import FindBarContainer from "./findbarcontainer";
 
+// Helper function to create rows and columns
+const createRowsAndColumns = (typedData: RowWithColumns[], rowIds: string[]) => {
+  const rows: Record<string, string>[] = [];
+  const fieldNamesSet = new Set<string>();
+
+  typedData.forEach((rowWithColumns: RowWithColumns) => {
+    const rowData: Record<string, string> = {};
+    rowIds.push(rowWithColumns.row.id); // Collect row IDs
+    rowWithColumns.columns.forEach((column) => {
+      rowData[column.fieldname] = column.columncontent;
+      fieldNamesSet.add(column.fieldname); // Collect unique field names
+    });
+    rows.push(rowData);
+  });
+
+  const fieldNames = [...fieldNamesSet]; // Convert Set to array
+  return { rows, fieldNames };
+};
+
 interface TableMainContainerProps {
   showFindBar: boolean;
   toggleFindBar: () => void;
@@ -49,43 +68,19 @@ export default function TableMainContainer({ showFindBar, toggleFindBar } : Tabl
 
   // const queryClient = useQueryClient();
 
-  const { data, error } = api.table.getTableRowsAndColumns.useQuery(
+  const { data, isLoading, error } = api.table.getTableRowsAndColumns.useQuery(
     { tableid: tableId! }, 
     { enabled: !!tableId } 
   );
 
-  const typedData = data as unknown as RowWithColumns[];
-
   const mutation = api.column.updateColContent.useMutation();
 
   useEffect(() => {
-    if (error || !data || data.length === 0) {
-      console.error("Error fetching table data:", error);
-      setTableData([]);
-      setColumns([]);
-      setRowIds([]);
-      return;
-    }
+    if (isLoading || error || !data) return;
+    const typedData = data as unknown as RowWithColumns[];
 
     const rowids_: string[] = [];
-    const rows = typedData.map((rowWithColumns : RowWithColumns) => {
-      const rowData: Record<string, string> = {};
-      rowids_.push(rowWithColumns.row.id);
-      rowWithColumns.columns.forEach((column) => {
-        rowData[column.fieldname] = column.columncontent;
-      });
-      return rowData;
-    });
-
-    // Extract unique fieldnames for columns
-    const fieldNames_ = new Set<string>();
-    typedData.forEach((rowWithColumns : RowWithColumns) => {
-      rowWithColumns.columns.forEach((col) => {
-        fieldNames_.add(col.fieldname);
-      });
-    });
-    setFieldNames([...fieldNames_]);
-
+    const { rows, fieldNames: fieldNames_ } = createRowsAndColumns(typedData, rowids_);
     
     const tableColumns: TableColumn[] = Array.from(fieldNames_).map((fieldname) => ({
       header: fieldname,
@@ -123,11 +118,20 @@ export default function TableMainContainer({ showFindBar, toggleFindBar } : Tabl
       },
     }));
 
-    // Update state
-    setTableData(rows);
-    setColumns(tableColumns);
-    setRowIds(rowids_);
-  }, [data, typedData, error, mutation, searchTerm]);
+    if (JSON.stringify(rows) !== JSON.stringify(tableData)) {
+      console.log("rows", rows, " tabledata", tableData);
+      setTableData(rows);
+    }
+    if (JSON.stringify(tableColumns) !== JSON.stringify(columns)) {
+      setColumns(tableColumns);
+    }
+    if (JSON.stringify(rowids_) !== JSON.stringify(rowids)) {
+      setRowIds(rowids_);
+    }
+    if (JSON.stringify(fieldNames_) !== JSON.stringify(fieldnames)) {
+      setFieldNames(fieldNames_);
+    }
+  }, [data, error, isLoading, mutation, searchTerm, fieldnames, tableData, columns, rowids]);
 
   if (searchTerm) {
     const firstHighlightedElement = document.querySelector('[data-highlighted="true"]');

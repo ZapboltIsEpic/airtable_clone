@@ -70,7 +70,6 @@ export const rowRouter = createTRPCRouter({
     const { data : newData } = await ctx.supabase
       .schema('public')
       .from('rows')
-      .insert([{ tableid: input.tableid }])
       .select("*");
 
     return newData?.map(row => ({

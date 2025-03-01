@@ -2,6 +2,7 @@
 
 import Image from "next/image"
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 // import CreateBasePopUp from "createbasepopup";
 import { api } from "~/trpc/react";
@@ -15,8 +16,9 @@ interface Session {
 
 export default function HomeSideBar({ session, isExpanded }: { session: Session; isExpanded: boolean }) {
 
+    const router = useRouter();
+
     const [isHovered, setIsHovered] = useState(false);
-    // const router = useRouter()
     const handleMouseEnter = () => {
         setIsHovered(true);
     };
@@ -28,13 +30,12 @@ export default function HomeSideBar({ session, isExpanded }: { session: Session;
     const expanded = isHovered || isExpanded;
 
     const { mutate: createBase } = api.base.create.useMutation({
-        // instead take him straight to the base
-        onSuccess: () => {
-          console.log("Base created successfully");
-          alert("Base created successfully");
+        onSuccess: (data) => {
+            console.log("base created successfully, redirecting...")
+            router.push(`/base?baseid=${data[0]?.id}`);
         },
         onError: (error) => {
-          console.error("Error creating base:", error);
+            console.error("Error creating base:", error);
         },
     });
 

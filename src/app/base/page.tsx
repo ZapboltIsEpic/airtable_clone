@@ -1,13 +1,12 @@
 'use client';
 
-import { useEffect } from 'react'
+import { useEffect, Suspense } from 'react';
 import { redirect, useSearchParams } from 'next/navigation';
-import BaseNavBar from '../_components/base/basenavbar'
+import BaseNavBar from '../_components/base/basenavbar';
 import BaseMainContent from '../_components/base/basemaincontent';
 import { api } from '~/trpc/react';
-// import type { Base } from '@prisma/client';
 
-export default function BasePage() {
+function BasePageContent() {
     const searchParams = useSearchParams();
     const id = searchParams.get('baseid')?.replace(/^"|"$/g, '') ?? "";
 
@@ -15,23 +14,14 @@ export default function BasePage() {
         const storedSession = localStorage.getItem("sb-xasktggrrutkhavrsexk-auth-token");
         if (storedSession) {
             // setSession(JSON.parse(storedSession) as Session);
-        }
-        else {
+        } else {
             redirect("/login");
         }
     }, []);
 
-    // interface Session {
-    //     user: {
-    //         id: string;
-    //     };
-    // }
-
-    // const [session, setSession] = useState<Session | null>(null);
-
     const { data: base, isLoading, error } = api.base.getSpecificBase.useQuery(
         { id: id }, 
-        { enabled: !!id} 
+        { enabled: !!id }
     );
 
     if (isLoading) return <div>Loading...</div>;
@@ -43,11 +33,19 @@ export default function BasePage() {
     return (
         <div>
             {base?.[0] && (
-            <>
-                <BaseNavBar base={base[0]} />
-                <BaseMainContent base={base[0]} />
-            </>
+                <>
+                    <BaseNavBar base={base[0]} />
+                    <BaseMainContent base={base[0]} />
+                </>
             )}
         </div>
-    )
+    );
+}
+
+export default function BasePage() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <BasePageContent />
+        </Suspense>
+    );
 }

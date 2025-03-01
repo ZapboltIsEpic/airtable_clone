@@ -165,7 +165,6 @@ export const tableRouter = createTRPCRouter({
     const { data: newData} = await ctx.supabase
       .schema('public')
       .from('tables')
-      .insert([{ name: input.name, baseid: input.baseid }])
       .select("*");
 
     if (!newData) {

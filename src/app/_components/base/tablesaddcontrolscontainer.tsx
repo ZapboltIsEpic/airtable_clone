@@ -23,7 +23,14 @@ export default function TablesAddControlsContainer({base} : { base : Base}) {
 
     useEffect(() => {
         setTablesData(tables ?? []);
-    }, [tables]);
+        if (searchParams.get('tableid') === null) {
+            const newParams = new URLSearchParams(searchParams);
+            newParams.set("tableid", tables?.[0]?.id ?? "");
+            console.log(tables);
+    
+            router.replace(`${pathname}?${newParams.toString()}`);
+        };
+    }, [tables, pathname, router, searchParams]);
 
     const { mutateAsync: createNewTableApi } = api.table.create.useMutation();
 
@@ -67,13 +74,6 @@ export default function TablesAddControlsContainer({base} : { base : Base}) {
 
     const tableCount = tables?.length ?? 0;
     const newTableName = `Table ${tableCount + 1}`;
-
-    if (searchParams.get('tableid') === null) {
-        const newParams = new URLSearchParams(searchParams);
-        newParams.set("tableid", tables?.[0]?.id ?? "");
-
-        router.replace(`${pathname}?${newParams.toString()}`);
-    };
 
     return (
         <div className="relative hide-print bg-[rgb(207,245,209)]">

@@ -160,21 +160,7 @@ export const baseRouter = createTRPCRouter({
   
         }
       }
-
-      const { data : newData} = await ctx.supabase
-        .schema('public')
-        .from('bases')
-        .insert([{ name: input.name, workspace: input.workspace, userid: input.userId }])
-        .select("*");
-
-      if (!newData) {
-        throw new Error("Failed to insert new base data");
-      }
-
-      return newData.map(base => ({
-        ...base,
-        createdat: base.createdat ? new Date(base.createdat) : null,
-        updatedat: base.updatedat ? new Date(base.updatedat) : null,
-      })) as Base[];
+      
+      return typedTableData;
     }),
 });
