@@ -8,7 +8,14 @@ import {
   publicProcedure,
 } from "~/server/api/trpc";
 
-import type { Table, Row } from "@prisma/client";
+import type { Table } from "@prisma/client";
+
+interface Row {
+  id: string;
+  tableid: string;
+  createdat: Date | null;
+  updatedat: Date | null;
+}
 
 export const tableRouter = createTRPCRouter({
 
@@ -25,7 +32,11 @@ export const tableRouter = createTRPCRouter({
         throw new Error(error.message);
       }
 
-      return data as Table[];
+      return data.map(table => ({
+        ...table,
+        createdat: table.createdat ? new Date(table.createdat) : null,
+        updatedat: table.updatedat ? new Date(table.updatedat) : null,
+      })) as Table[];
     }),
 
   getTableRowsAndColumns: publicProcedure
@@ -43,18 +54,18 @@ export const tableRouter = createTRPCRouter({
         }
     
         // Fetch columns for each row
-        const columnsPromises = rows.map(async (row : Row) => {
-          const { data: columns, error: columnError } = await ctx.supabase
+        const columnsPromises = rows.map(async (row) => {
+          const typedRow: Row = {
+            ...row,
+            createdat: row.createdat ? new Date(row.createdat) : null,
+            updatedat: row.updatedat ? new Date(row.updatedat) : null,
+          };
+          const { data: columns } = await ctx.supabase
             .schema('public')
             .from('columns')
             .select('*')
             .eq('rowid', row.id);
-    
-          if (columnError) {
-            throw new Error(`Error fetching columns for row ${row.id}: ${columnError.message}`);
-          }
-    
-          return { row, columns };
+          return { row: typedRow, columns };
         });
     
         const rowsWithColumns = await Promise.all(columnsPromises);
@@ -83,8 +94,15 @@ export const tableRouter = createTRPCRouter({
       throw new Error(error.message);
     }
 
-    const typedData = data as Table[];
+    const typedData = data.map(table => ({
+      ...table,
+      createdat: table.createdat ? new Date(table.createdat) : null,
+      updatedat: table.updatedat ? new Date(table.updatedat) : null,
+    })) as Table[];
     const tableId = typedData[0]?.id;
+    if (!tableId) {
+      throw new Error('Table ID is undefined.');
+    }
 
     for (let i = 0; i < 3; i++) {
       const { data: rowData, error: rowError } = await ctx.supabase
@@ -124,14 +142,22 @@ export const tableRouter = createTRPCRouter({
           fieldName = "Status";
         }
 
-        const {} = await ctx.supabase
-        .schema('public')
-        .from('columns')
-        .insert([{ 
-          fieldname: fieldName,
-          columncontent: "",
-          rowid: rowId
-        }])
+        if (!rowId) {
+          throw new Error(`Row ID is undefined for row ${i + 1}`);
+        }
+
+        const { error: columnError } = await ctx.supabase
+          .schema('public')
+          .from('columns')
+          .insert([{ 
+            fieldname: fieldName,
+            columncontent: "",
+            rowid: rowId
+          }]);
+
+        if (columnError) {
+          console.error(`Error inserting column ${j + 1} for row ${i + 1}:`, columnError);
+        }
 
       }
     }
@@ -142,6 +168,16 @@ export const tableRouter = createTRPCRouter({
       .insert([{ name: input.name, baseid: input.baseid }])
       .select("*");
 
-    return newData as Table[];
+    if (!newData) {
+      throw new Error('Failed to insert new table.');
+    }
+
+    const typedNewData = newData.map(table => ({
+      ...table,
+      createdat: table.createdat ? new Date(table.createdat) : null,
+      updatedat: table.updatedat ? new Date(table.updatedat) : null,
+    })) as Table[];
+
+    return typedNewData;
     }),
 });

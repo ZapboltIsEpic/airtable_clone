@@ -25,7 +25,13 @@ export const columnRouter = createTRPCRouter({
           throw new Error(error.message);
         }
 
-        return data as Column[];
+        const convertedData = data.map(item => ({
+          ...item,
+          createdat: item.createdat ? new Date(item.createdat) : null,
+          updatedat: item.updatedat ? new Date(item.updatedat) : null,
+        }));
+        
+        return convertedData;
     }),
 
   
@@ -78,13 +84,19 @@ export const columnRouter = createTRPCRouter({
     const { data, error } = await ctx.supabase
       .schema('public')
       .from('columns')
-      .insert([{ rowid: input.rowid, fieldname: input.fieldname }])
+      .insert([{ rowid: input.rowid, fieldname: input.fieldname, columncontent: "" }])
       .select("*");
 
     if (error) {
       throw new Error(error.message);
     }
 
-    return data as Column[];
+    const convertedData = data.map(item => ({
+      ...item,
+      createdat: item.createdat ? new Date(item.createdat) : null,
+      updatedat: item.updatedat ? new Date(item.updatedat) : null,
+    }));
+
+    return convertedData as Column[];
     }),
 });

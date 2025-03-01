@@ -24,7 +24,11 @@ export const rowRouter = createTRPCRouter({
           throw new Error(error.message);
         }
 
-        return data as Row[];
+        return data.map(row => ({
+          ...row,
+          createdat: row.createdat ? new Date(row.createdat) : null,
+          updatedat: row.updatedat ? new Date(row.updatedat) : null,
+        })) as Row[];
     }),
 
   createNewRow: publicProcedure
@@ -40,7 +44,11 @@ export const rowRouter = createTRPCRouter({
       .insert([{ tableid: input.tableid }])
       .select("*");
 
-    const typedData = data as Row[];
+    const typedData = data?.map(row => ({
+      ...row,
+      createdat: row.createdat ? new Date(row.createdat) : null,
+      updatedat: row.updatedat ? new Date(row.updatedat) : null,
+    })) as Row[];
 
     if (error) {
       throw new Error(error.message);
@@ -51,7 +59,7 @@ export const rowRouter = createTRPCRouter({
         const { error: colError } = await ctx.supabase
           .schema('public')
           .from('columns')
-          .insert([{ rowid : typedData[0]?.id, fieldname: fieldname, columncontent: ""}])
+          .insert([{ rowid : typedData[0]?.id ?? "", fieldname: fieldname, columncontent: ""}])
         
         if (colError) {
           throw new Error(colError.message);
@@ -65,6 +73,10 @@ export const rowRouter = createTRPCRouter({
       .insert([{ tableid: input.tableid }])
       .select("*");
 
-    return newData as Row[];
+    return newData?.map(row => ({
+      ...row,
+      createdat: row.createdat ? new Date(row.createdat) : null,
+      updatedat: row.updatedat ? new Date(row.updatedat) : null,
+    })) as Row[];
     }),
 });

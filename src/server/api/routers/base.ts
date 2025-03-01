@@ -24,7 +24,11 @@ export const baseRouter = createTRPCRouter({
           throw new Error(error.message);
         }
 
-        return data as Base[];
+        return data.map(base => ({
+          ...base,
+          createdat: base.createdat ? new Date(base.createdat) : null,
+          updatedat: base.updatedat ? new Date(base.updatedat) : null,
+        })) as Base[];
     }),
   
   // should only return 1 base
@@ -41,7 +45,11 @@ export const baseRouter = createTRPCRouter({
         throw new Error(error.message);
       }
 
-      return data as Base[];
+      return data.map(base => ({
+        ...base,
+        createdat: base.createdat ? new Date(base.createdat) : null,
+        updatedat: base.updatedat ? new Date(base.updatedat) : null,
+      })) as Base[];
   }),
 
 
@@ -64,7 +72,11 @@ export const baseRouter = createTRPCRouter({
         throw new Error(error.message);
       }
 
-      const typedData = data as Base[]
+      const typedData = data.map(base => ({
+        ...base,
+        createdat: base.createdat ? new Date(base.createdat) : null,
+        updatedat: base.updatedat ? new Date(base.updatedat) : null,
+      })) as Base[];
       const baseId = typedData[0]?.id;
       
       const { data: tableData, error: tableError } = await ctx.supabase
@@ -72,7 +84,7 @@ export const baseRouter = createTRPCRouter({
         .from('tables')
         .insert([{ 
             name: "Table 1", 
-            baseid: baseId 
+            baseid: baseId!
         }])
         .select("*")
 
@@ -80,7 +92,11 @@ export const baseRouter = createTRPCRouter({
           throw new Error(tableError.message);
       }
 
-      const typedTableData = tableData as Table[];
+      const typedTableData = tableData.map(table => ({
+        ...table,
+        createdat: table.createdat ? new Date(table.createdat) : null,
+        updatedat: table.updatedat ? new Date(table.updatedat) : null,
+      })) as Table[];
       const tableId = typedTableData[0]?.id;
 
       for (let i = 0; i < 3; i++) {
@@ -88,7 +104,7 @@ export const baseRouter = createTRPCRouter({
           .schema('public')
           .from('rows')
           .insert([{ 
-              tableid: tableId
+              tableid: tableId!
           }])
           .select("*");
   
@@ -96,7 +112,11 @@ export const baseRouter = createTRPCRouter({
           throw new Error(`No row data returned for row ${i + 1}`);
         }
         
-        const typedRowData = rowData as Row[];
+        const typedRowData = rowData.map(row => ({
+          ...row,
+          createdat: row.createdat ? new Date(row.createdat) : null,
+          updatedat: row.updatedat ? new Date(row.updatedat) : null,
+        })) as Row[];
         const rowId = typedRowData[0]?.id;
     
         if (rowError) {
@@ -121,14 +141,22 @@ export const baseRouter = createTRPCRouter({
             fieldName = "Status";
           }
   
-          const {} = await ctx.supabase
-          .schema('public')
-          .from('columns')
-          .insert([{ 
-            fieldname: fieldName,
-            columncontent: "",
-            rowid: rowId
-          }])
+          if (!rowId) {
+            throw new Error(`Row ID is undefined for row ${i + 1}`);
+          }
+
+          const { error: columnError } = await ctx.supabase
+            .schema('public')
+            .from('columns')
+            .insert([{ 
+              fieldname: fieldName,
+              columncontent: "",
+              rowid: rowId
+            }]);
+
+          if (columnError) {
+            console.error(`Error inserting column ${j + 1} for row ${i + 1}:`, columnError);
+          }
   
         }
       }
@@ -139,6 +167,14 @@ export const baseRouter = createTRPCRouter({
         .insert([{ name: input.name, workspace: input.workspace, userid: input.userId }])
         .select("*");
 
-      return newData as Base[];
+      if (!newData) {
+        throw new Error("Failed to insert new base data");
+      }
+
+      return newData.map(base => ({
+        ...base,
+        createdat: base.createdat ? new Date(base.createdat) : null,
+        updatedat: base.updatedat ? new Date(base.updatedat) : null,
+      })) as Base[];
     }),
 });
