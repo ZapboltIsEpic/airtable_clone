@@ -42,8 +42,12 @@ export default function BasePage() {
 
     return (
         <div>
-            <BaseNavBar base={base?.[0]}/>
-            <BaseMainContent base={base?.[0]}/>
+            {base?.[0] && (
+            <>
+                <BaseNavBar base={base[0]} />
+                <BaseMainContent base={base[0]} />
+            </>
+            )}
         </div>
     )
 }
