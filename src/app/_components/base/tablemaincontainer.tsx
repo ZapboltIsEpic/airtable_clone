@@ -164,7 +164,7 @@ export default function TableMainContainer({ showFindBar, toggleFindBar } : Tabl
       return { previousTableData };
     },
   
-    onError: (error, newColumn, context) => {
+    onError: (error, context) => {
       console.error('Error creating column:', error);
       if (context?.previousTableData) {
         setTableData(context.previousTableData);
