@@ -5,7 +5,7 @@ import { api } from "~/trpc/react";
 import TableTab from "./tabletab";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import type { Table, Base } from "@prisma/client";
 
 export default function TablesAddControlsContainer({base} : { base : Base}) {

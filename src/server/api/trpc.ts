@@ -7,10 +7,10 @@
  * need to use are documented accordingly near the end.
  */
 
-import { initTRPC, TRPCError } from "@trpc/server";
+import { initTRPC } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
-import { SupabaseClient } from "@supabase/supabase-js";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 // import { auth } from "~/server/auth";
 import { db } from "~/server/db";
@@ -27,7 +27,7 @@ import { db } from "~/server/db";
  *
  * @see https://trpc.io/docs/server/context
  */
-export const createTRPCContext = async (opts: { headers: Headers; supabase: SupabaseClient<any, "public", any>; }) => {
+export const createTRPCContext = async (opts: { headers: Headers; supabase: SupabaseClient<never, "public", never>; }) => {
   // const session = await auth();
 
   return {

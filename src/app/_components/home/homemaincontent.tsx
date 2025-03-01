@@ -1,11 +1,10 @@
 'use client';
 
-import { useEffect, useState } from "react";
 import { api } from "~/trpc/react";
 import Image from "next/image"
 import TableCreationWayFlexBox from "../tablecreationwayflexbox"
 import BaseListItem from "./baselistitem";
-import { Base } from "@prisma/client";
+import type { Base } from "@prisma/client";
 
 interface Session {
     user: {

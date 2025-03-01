@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { type CellContext, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import Image from "next/image";
 import { api } from "~/trpc/react"; 

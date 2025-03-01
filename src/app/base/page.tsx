@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react'
-import { redirect, useRouter, useSearchParams } from 'next/navigation';
+import { useEffect } from 'react'
+import { redirect, useSearchParams } from 'next/navigation';
 import BaseNavBar from '../_components/base/basenavbar'
 import BaseMainContent from '../_components/base/basemaincontent';
 import { api } from '~/trpc/react';
-import { Base } from '@prisma/client';
+// import type { Base } from '@prisma/client';
 
 export default function BasePage() {
     const searchParams = useSearchParams();
@@ -14,20 +14,20 @@ export default function BasePage() {
     useEffect(() => {
         const storedSession = localStorage.getItem("sb-xasktggrrutkhavrsexk-auth-token");
         if (storedSession) {
-            setSession(JSON.parse(storedSession) as Session);
+            // setSession(JSON.parse(storedSession) as Session);
         }
         else {
             redirect("/login");
         }
     }, []);
 
-    interface Session {
-        user: {
-            id: string;
-        };
-    }
+    // interface Session {
+    //     user: {
+    //         id: string;
+    //     };
+    // }
 
-    const [session, setSession] = useState<Session | null>(null);
+    // const [session, setSession] = useState<Session | null>(null);
 
     const { data: base, isLoading, error } = api.base.getSpecificBase.useQuery(
         { id: id }, 

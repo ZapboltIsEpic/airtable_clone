@@ -1,7 +1,6 @@
 'use client';
 
-import { Table } from "@prisma/client";
-import Image from "next/image";
+import type { Table } from "@prisma/client";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 
