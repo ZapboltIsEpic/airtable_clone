@@ -166,8 +166,8 @@ export default function TableMainContainer({ showFindBar, toggleFindBar } : Tabl
   
     onError: (error, context) => {
       console.error('Error creating column:', error);
-      if (context?.previousTableData) {
-        setTableData(context.previousTableData);
+      if (context) {
+        setTableData(context as unknown as Record<string, string>[]);
       }
       // queryClient.setQueryData('tableData', context.previousTableData);
     },
@@ -199,10 +199,10 @@ export default function TableMainContainer({ showFindBar, toggleFindBar } : Tabl
       return { previousTableData };
     },
   
-    onError: (error, newColumn, context) => {
+    onError: (error, context) => {
       console.error('Error creating row:', error);
-      if (context?.previousTableData) {
-        setTableData(context.previousTableData);
+      if (context) {
+        setTableData(context as unknown as Record<string, string>[]);
       } 
   
       // queryClient.setQueryData('tableData', context.previousTableData);
