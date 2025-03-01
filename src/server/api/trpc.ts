@@ -14,6 +14,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 // import { auth } from "~/server/auth";
 import { db } from "~/server/db";
+import type { Database } from "~/types/supabase";
 
 /**
  * 1. CONTEXT
@@ -27,7 +28,7 @@ import { db } from "~/server/db";
  *
  * @see https://trpc.io/docs/server/context
  */
-export const createTRPCContext = async (opts: { headers: Headers; supabase: SupabaseClient<never, "public", never>; }) => {
+export const createTRPCContext = async (opts: { headers: Headers; supabase: SupabaseClient<Database>; }) => {
   // const session = await auth();
 
   return {
