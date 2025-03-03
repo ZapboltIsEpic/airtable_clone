@@ -32,7 +32,7 @@ export default function HomeSideBar({ session, isExpanded }: { session: Session;
     const { mutate: createBase } = api.base.create.useMutation({
         onSuccess: (data) => {
             console.log("base created successfully, redirecting...")
-            router.push(`/base?baseid=${data[0]?.id}`);
+            router.push(`/base?baseid=${data[0]?.baseid}&tableid=${data[0]?.id}`);
         },
         onError: (error) => {
             console.error("Error creating base:", error);

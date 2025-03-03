@@ -53,7 +53,6 @@ export const baseRouter = createTRPCRouter({
   }),
 
 
-    // should be protected but doesnt work for some reason?
   create: publicProcedure
     .input(z.object({ 
         name: z.string(),

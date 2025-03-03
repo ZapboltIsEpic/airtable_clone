@@ -5,16 +5,17 @@ import { api } from "~/trpc/react";
 import TableTab from "./tabletab";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { Table, Base } from "@prisma/client";
 
 export default function TablesAddControlsContainer({base} : { base : Base}) {
     const router = useRouter();
     const searchParams = useSearchParams();
     const pathname = usePathname();
-    // const queryClient = useQueryClient();
+    const queryClient = useQueryClient();
 
     const [tablesData, setTablesData] = useState<Table[]>([]);
+    const [routerPath, setRouterPath] = useState("");
 
     const { data: tables, isLoading} = api.table.getAllTables.useQuery(
         { baseid: base?.id }, 
@@ -27,10 +28,11 @@ export default function TablesAddControlsContainer({base} : { base : Base}) {
             const newParams = new URLSearchParams(searchParams);
             newParams.set("tableid", tables?.[0]?.id ?? "");
             console.log(tables);
+            setRouterPath(`${pathname}?${newParams.toString()}`);
     
             router.replace(`${pathname}?${newParams.toString()}`);
         };
-    }, [tables, pathname, router, searchParams]);
+    }, [tables, pathname, router, searchParams, routerPath]);
 
     const { mutateAsync: createNewTableApi } = api.table.create.useMutation();
 
@@ -41,6 +43,7 @@ export default function TablesAddControlsContainer({base} : { base : Base}) {
         },
         
         onMutate: async (newTable) => {
+            await queryClient.cancelQueries();
             const previousTablesData = [...tablesData];
         
             const newTableData = {
@@ -54,21 +57,31 @@ export default function TablesAddControlsContainer({base} : { base : Base}) {
             const newTablesData = [...tablesData, newTableData];
             setTablesData(newTablesData); 
 
-            return { previousTablesData };
+            return { previousTablesData, tempId: newTableData.id };
+        },
+
+        onSuccess: (response, newTable, context) => {
+            if (!response[0]?.id) return;
+            console.log("id", response[0]?.id);
+        
+            setTablesData((prevTables) =>
+              prevTables.map((table) =>
+                table.id === context?.tempId ? { ...table, id: response[0]?.id ?? "" } : table
+              )
+            );
         },
         
-        onError: (error, context) => {
+        onError: (response, error, context) => {
             console.error('Error creating table:', error);
-            if (context) {
-                setTablesData(context as unknown as Table[]);
+            if (context?.previousTablesData) {
+                setTablesData(context.previousTablesData as unknown as Table[]);
             }  
         
             // queryClient.setQueryData('tableData', context.previousTableData);
         },
         
-        onSettled: () => {
-            // rather than tableData probs have to put back in current format... but that is kinda pain in the ass.
-            // queryClient.invalidateQueries({ queryKey: ["tablesData"] }); 
+        onSettled: async () => {
+            await queryClient.invalidateQueries({ queryKey: ["tablesData"] }); 
         }
     })
 

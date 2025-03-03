@@ -162,21 +162,6 @@ export const tableRouter = createTRPCRouter({
       }
     }
 
-    const { data: newData} = await ctx.supabase
-      .schema('public')
-      .from('tables')
-      .select("*");
-
-    if (!newData) {
-      throw new Error('Failed to insert new table.');
-    }
-
-    const typedNewData = newData.map(table => ({
-      ...table,
-      createdat: table.createdat ? new Date(table.createdat) : null,
-      updatedat: table.updatedat ? new Date(table.updatedat) : null,
-    })) as Table[];
-
-    return typedNewData;
+    return typedData;
     }),
 });
