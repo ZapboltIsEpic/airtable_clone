@@ -14,20 +14,26 @@ export default function TablesAddControlsContainer({base} : { base : Base}) {
     const pathname = usePathname();
     const queryClient = useQueryClient();
 
-    const [tablesData, setTablesData] = useState<Table[]>([]);
     const [routerPath, setRouterPath] = useState("");
 
-    const { data: tables, isLoading} = api.table.getAllTables.useQuery(
+    const { data: tables, isLoading } = api.table.getAllTables.useQuery(
         { baseid: base?.id }, 
         { enabled: !!base?.id }
     );
 
     useEffect(() => {
-        setTablesData(tables ?? []);
+        queryClient.setQueryData<Table[]>(
+            ['table.getAllTables', { baseid: base?.id }],
+            (old = []) => tables ?? old
+        );
+    }, [tables, base?.id, queryClient]);
+
+    const tablesData = queryClient.getQueryData<Table[]>(['table.getAllTables', { baseid: base?.id }]) ?? [];
+
+    useEffect(() => {
         if (searchParams.get('tableid') === null) {
             const newParams = new URLSearchParams(searchParams);
             newParams.set("tableid", tables?.[0]?.id ?? "");
-            console.log(tables);
             setRouterPath(`${pathname}?${newParams.toString()}`);
     
             router.replace(`${pathname}?${newParams.toString()}`);
@@ -43,8 +49,8 @@ export default function TablesAddControlsContainer({base} : { base : Base}) {
         },
         
         onMutate: async (newTable) => {
-            await queryClient.cancelQueries();
-            const previousTablesData = [...tablesData];
+            const previousTables = tables ?? [];
+            console.log("previousTables", previousTables);
         
             const newTableData = {
                 name: newTable.name,
@@ -54,34 +60,41 @@ export default function TablesAddControlsContainer({base} : { base : Base}) {
                 baseid: newTable.baseid, 
                 numberedid: tablesData.length + 1,
             }
-            const newTablesData = [...tablesData, newTableData];
-            setTablesData(newTablesData); 
 
-            return { previousTablesData, tempId: newTableData.id };
+            queryClient.setQueryData<Table[]>(
+                ['table.getAllTables', { baseid: newTable.baseid }],
+                (old = []) => [...old, newTableData]
+            );
+            return { previousTables, tempId: newTableData.id };
         },
 
         onSuccess: (response, newTable, context) => {
             if (!response[0]?.id) return;
             console.log("id", response[0]?.id);
-        
-            setTablesData((prevTables) =>
-              prevTables.map((table) =>
-                table.id === context?.tempId ? { ...table, id: response[0]?.id ?? "" } : table
-              )
+
+            queryClient.setQueryData<Table[]>(
+                ['table.getAllTables', { baseid: newTable.baseid }],
+                (old = []) =>
+                    old.map((table) =>
+                        table.id === context?.tempId ? { ...table, id: response[0]?.id ?? "" } : table
+                    )
             );
+
+            console.log("newTables", queryClient.getQueryData(['table.getAllTables', { baseid: newTable.baseid }]));
         },
         
-        onError: (response, error, context) => {
+        onError: (error, newTable, context) => {
             console.error('Error creating table:', error);
-            if (context?.previousTablesData) {
-                setTablesData(context.previousTablesData as unknown as Table[]);
+            if (context?.previousTables) {
+                queryClient.setQueryData<Table[]>(
+                    ['table.getAllTables', { baseid: newTable.baseid }],
+                    context.previousTables
+                );
             }  
-        
-            // queryClient.setQueryData('tableData', context.previousTableData);
         },
         
         onSettled: async () => {
-            await queryClient.invalidateQueries({ queryKey: ["tablesData"] }); 
+            await queryClient.refetchQueries({ queryKey: ['table.getAllTables'] });
         }
     })
 
