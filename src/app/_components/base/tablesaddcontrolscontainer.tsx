@@ -15,6 +15,7 @@ export default function TablesAddControlsContainer({base} : { base : Base}) {
     const queryClient = useQueryClient();
 
     const [routerPath, setRouterPath] = useState("");
+    const [tablesData, setTablesData] = useState<Table[]>([]);
 
     const { data: tables, isLoading } = api.table.getAllTables.useQuery(
         { baseid: base?.id }, 
@@ -22,13 +23,14 @@ export default function TablesAddControlsContainer({base} : { base : Base}) {
     );
 
     useEffect(() => {
-        queryClient.setQueryData<Table[]>(
-            ['table.getAllTables', { baseid: base?.id }],
-            (old = []) => tables ?? old
-        );
+        if (tables) {
+            queryClient.setQueryData<Table[]>(
+                ['table.getAllTables', { baseid: base?.id }],
+                tables
+            );
+            setTablesData(tables);
+        }
     }, [tables, base?.id, queryClient]);
-
-    const tablesData = queryClient.getQueryData<Table[]>(['table.getAllTables', { baseid: base?.id }]) ?? [];
 
     useEffect(() => {
         if (searchParams.get('tableid') === null) {
@@ -41,7 +43,6 @@ export default function TablesAddControlsContainer({base} : { base : Base}) {
     }, [tables, pathname, router, searchParams, routerPath]);
 
     const { mutateAsync: createNewTableApi } = api.table.create.useMutation();
-
     const { mutate : createTable, } = useMutation({
         mutationFn: async (newTable: { name: string; baseid: string }) => {
             const response = await createNewTableApi(newTable); 
@@ -65,6 +66,8 @@ export default function TablesAddControlsContainer({base} : { base : Base}) {
                 ['table.getAllTables', { baseid: newTable.baseid }],
                 (old = []) => [...old, newTableData]
             );
+            setTablesData((prevData) => [...prevData, newTableData]);
+
             return { previousTables, tempId: newTableData.id };
         },
 
@@ -79,6 +82,11 @@ export default function TablesAddControlsContainer({base} : { base : Base}) {
                         table.id === context?.tempId ? { ...table, id: response[0]?.id ?? "" } : table
                     )
             );
+            setTablesData((prevData) =>
+                prevData.map((table) =>
+                    table.id === context?.tempId ? { ...table, id: response[0]?.id ?? "" } : table
+                )
+            );
 
             console.log("newTables", queryClient.getQueryData(['table.getAllTables', { baseid: newTable.baseid }]));
         },
@@ -90,15 +98,16 @@ export default function TablesAddControlsContainer({base} : { base : Base}) {
                     ['table.getAllTables', { baseid: newTable.baseid }],
                     context.previousTables
                 );
+                setTablesData(context.previousTables);
             }  
         },
         
         onSettled: async () => {
-            await queryClient.refetchQueries({ queryKey: ['table.getAllTables'] });
+            await queryClient.refetchQueries({ queryKey: ['table.getAllTables', { baseid: base?.id }] });
         }
     })
 
-    const tableCount = tables?.length ?? 0;
+    const tableCount = tablesData?.length ?? 0;
     const newTableName = `Table ${tableCount + 1}`;
 
     return (
