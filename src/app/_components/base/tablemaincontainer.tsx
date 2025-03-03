@@ -3,12 +3,11 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
-import { type CellContext, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
+import { type CellContext, flexRender, getCoreRowModel, getSortedRowModel, type SortingState, useReactTable } from "@tanstack/react-table";
 import Image from "next/image";
 import { api } from "~/trpc/react"; 
 import FindBarContainer from "./findbarcontainer";
 
-// Helper function to create rows and columns
 const createRowsAndColumns = (typedData: RowWithColumns[], rowIds: string[]) => {
   const rows: Record<string, string>[] = [];
   const fieldNamesSet = new Set<string>();
@@ -65,6 +64,7 @@ export default function TableMainContainer({ showFindBar, toggleFindBar } : Tabl
   const [rowids, setRowIds] = useState<string[]>([]);
   const [fieldnames, setFieldNames] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [sorting, setSorting] = useState<SortingState>([])
 
   // const queryClient = useQueryClient();
 
@@ -81,49 +81,10 @@ export default function TableMainContainer({ showFindBar, toggleFindBar } : Tabl
 
     const rowids_: string[] = [];
     const { rows, fieldNames: fieldNames_ } = createRowsAndColumns(typedData, rowids_);
-    
-    const tableColumns: TableColumn[] = Array.from(fieldNames_).map((fieldname) => ({
-      header: fieldname,
-      accessorKey: fieldname,
-      cell: ({ getValue, row, column }: CellContext<Record<string, string>, string>) => {
-        const initialValue = getValue();
-  
-        const onBlur = () => {
-          if (initialValue !== row.original[column.id]) {
-            mutation.mutate({
-              rowid: rowids_[row.index] ?? "",
-              columncontent: initialValue,
-              fieldname: column.id,
-            });
-          }
-          row.original[column.id] = initialValue;
-        };
-
-        const isHighlighted =
-          searchTerm != "" && 
-          initialValue != "" && 
-          initialValue.toLowerCase().includes(searchTerm.toLowerCase());
-
-        return (
-          <div className={`w-[180px] h-[32px] flex items-center justify-center`}>
-            <input
-              value={initialValue}
-              onChange={(e) => row.original[column.id] = e.target.value}
-              onBlur={onBlur}
-              className={`w-full h-full outline-none ${isHighlighted ? "bg-[rgb(255,243,211)]" : ""}`}
-              data-highlighted={isHighlighted ? "true" : "false"}
-            />
-          </div>
-        );
-      },
-    }));
 
     if (JSON.stringify(rows) !== JSON.stringify(tableData)) {
       console.log("rows", rows, " tabledata", tableData);
       setTableData(rows);
-    }
-    if (JSON.stringify(tableColumns) !== JSON.stringify(columns)) {
-      setColumns(tableColumns);
     }
     if (JSON.stringify(rowids_) !== JSON.stringify(rowids)) {
       setRowIds(rowids_);
@@ -131,7 +92,73 @@ export default function TableMainContainer({ showFindBar, toggleFindBar } : Tabl
     if (JSON.stringify(fieldNames_) !== JSON.stringify(fieldnames)) {
       setFieldNames(fieldNames_);
     }
-  }, [data, error, isLoading, mutation, searchTerm, fieldnames, tableData, columns, rowids]);
+  }, [data, error, isLoading, mutation, fieldnames, tableData, rowids, searchTerm]);
+
+  console.log("searchterm: ", searchTerm);
+
+  const EditableCell = ({
+    value: initialValue,
+    rowIndex,
+    columnId,
+    updateData,
+    searchTerm, 
+  }: {
+    value: string;
+    rowIndex: number;
+    columnId: string;
+    updateData: (rowIndex: number, columnId: string, value: string) => void;
+    searchTerm: string;
+  }) => {
+    const [value, setValue] = useState(initialValue);
+  
+    const onBlur = () => {
+      updateData(rowIndex, columnId, value);  
+    };
+  
+    const isHighlighted = searchTerm !== "" && 
+      value !== "" && 
+      value.toLowerCase().includes(searchTerm.toLowerCase());
+  
+    return (
+      <input
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        onBlur={onBlur}
+        className={`w-full h-full outline-none ${isHighlighted ? "bg-[rgb(255,243,211)]" : ""}`}
+      />
+    );
+  };
+
+  const tableColumns: TableColumn[] = Array.from(fieldnames).map((fieldname) => ({
+    header: fieldname,
+    accessorKey: fieldname,
+    cell: ({ getValue, row, column }: CellContext<Record<string, string>, string>) => {
+      const initialValue = getValue();
+  
+      return (
+        <EditableCell
+          value={initialValue}
+          rowIndex={row.index}
+          columnId={column.id}
+          updateData={(rowIndex, columnId, value) => {
+            mutation.mutate({
+              rowid: rowids[rowIndex] ?? "",
+              columncontent: value,
+              fieldname: columnId,
+            });
+          }}
+          searchTerm={searchTerm}
+        />
+      );
+    },
+  }));
+
+  useEffect(() => {
+    if (JSON.stringify(tableColumns) !== JSON.stringify(columns)) {
+      setColumns(tableColumns);
+    }
+  }, [columns, tableColumns]);
+
 
   if (searchTerm) {
     const firstHighlightedElement = document.querySelector('[data-highlighted="true"]');
@@ -139,12 +166,6 @@ export default function TableMainContainer({ showFindBar, toggleFindBar } : Tabl
       firstHighlightedElement.scrollIntoView({ behavior: "smooth", block: "center" });
     }
   }
-
-  const table = useReactTable({
-    columns,
-    data: tableData,
-    getCoreRowModel: getCoreRowModel(),
-  });
 
   const { mutateAsync: createNewColApi } = api.column.createNewCol.useMutation();
   const { mutateAsync: createNewRowApi } = api.row.createNewRow.useMutation();
@@ -216,6 +237,18 @@ export default function TableMainContainer({ showFindBar, toggleFindBar } : Tabl
       // queryClient.invalidateQueries({ queryKey: ["tableData"] }); 
     }
   })
+
+  const table = useReactTable({
+    columns,
+    data: tableData,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    manualSorting: true, 
+    state: {
+      sorting,
+    },
+    onSortingChange: setSorting,
+  });
 
   return (
     <div className="h-full w-full">
