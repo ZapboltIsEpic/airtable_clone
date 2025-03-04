@@ -1,113 +1,13 @@
-'use client';
-
 import Image from "next/image";
-import { api } from "~/trpc/react"; 
 import TableTab from "./tabletab";
-import { usePathname, useSearchParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { Table, Base } from "@prisma/client";
+import { useCreateTableMutation, useTablesQuery } from "~/app/services/table";
 
 export default function TablesAddControlsContainer({base} : { base : Base}) {
-    const router = useRouter();
-    const searchParams = useSearchParams();
-    const pathname = usePathname();
-    const queryClient = useQueryClient();
-
-    const [routerPath, setRouterPath] = useState("");
-    const [tablesData, setTablesData] = useState<Table[]>([]);
-
-    const { data: tables, isLoading } = api.table.getAllTables.useQuery(
-        { baseid: base?.id }, 
-        { enabled: !!base?.id }
-    );
-
-    useEffect(() => {
-        if (tables) {
-            queryClient.setQueryData<Table[]>(
-                ['table.getAllTables', { baseid: base?.id }],
-                tables
-            );
-            setTablesData(tables);
-        }
-    }, [tables, base?.id, queryClient]);
-
-    useEffect(() => {
-        if (searchParams.get('tableid') === null) {
-            const newParams = new URLSearchParams(searchParams);
-            newParams.set("tableid", tables?.[0]?.id ?? "");
-            setRouterPath(`${pathname}?${newParams.toString()}`);
-    
-            router.replace(`${pathname}?${newParams.toString()}`);
-        };
-    }, [tables, pathname, router, searchParams, routerPath]);
-
-    const { mutateAsync: createNewTableApi } = api.table.create.useMutation();
-    const { mutate : createTable, } = useMutation({
-        mutationFn: async (newTable: { name: string; baseid: string }) => {
-            const response = await createNewTableApi(newTable); 
-            return response; 
-        },
-        
-        onMutate: async (newTable) => {
-            const previousTables = tables ?? [];
-            console.log("previousTables", previousTables);
-        
-            const newTableData = {
-                name: newTable.name,
-                id: `temp-${tablesData.length + 1}`,
-                createdat: new Date(),
-                updatedat: new Date(),
-                baseid: newTable.baseid, 
-                numberedid: tablesData.length + 1,
-            }
-
-            queryClient.setQueryData<Table[]>(
-                ['table.getAllTables', { baseid: newTable.baseid }],
-                (old = []) => [...old, newTableData]
-            );
-            setTablesData((prevData) => [...prevData, newTableData]);
-
-            return { previousTables, tempId: newTableData.id };
-        },
-
-        onSuccess: (response, newTable, context) => {
-            if (!response[0]?.id) return;
-            console.log("id", response[0]?.id);
-
-            queryClient.setQueryData<Table[]>(
-                ['table.getAllTables', { baseid: newTable.baseid }],
-                (old = []) =>
-                    old.map((table) =>
-                        table.id === context?.tempId ? { ...table, id: response[0]?.id ?? "" } : table
-                    )
-            );
-            setTablesData((prevData) =>
-                prevData.map((table) =>
-                    table.id === context?.tempId ? { ...table, id: response[0]?.id ?? "" } : table
-                )
-            );
-
-            console.log("newTables", queryClient.getQueryData(['table.getAllTables', { baseid: newTable.baseid }]));
-        },
-        
-        onError: (error, newTable, context) => {
-            console.error('Error creating table:', error);
-            if (context?.previousTables) {
-                queryClient.setQueryData<Table[]>(
-                    ['table.getAllTables', { baseid: newTable.baseid }],
-                    context.previousTables
-                );
-                setTablesData(context.previousTables);
-            }  
-        },
-        
-        onSettled: async () => {
-            await queryClient.refetchQueries({ queryKey: ['table.getAllTables', { baseid: base?.id }] });
-        }
-    })
-
-    const tableCount = tablesData?.length ?? 0;
+    const { data : tables, isLoading : tablesLoading } = useTablesQuery(base.id);
+    const createTable = useCreateTableMutation();
+    const tablesData = tables ?? [];
+    const tableCount = tablesData.length ?? 0;
     const newTableName = `Table ${tableCount + 1}`;
 
     return (
@@ -117,7 +17,7 @@ export default function TablesAddControlsContainer({base} : { base : Base}) {
                     <div className="absolute all-0 pl-3">
                         <div className="flex flex-auto pt-1 -mt-1 pl-1 -ml-1">
                             <nav className="flex flex-none">   
-                                {isLoading ? <p>Loading tables...</p> : tableCount > 0 && tablesData.map((table : Table) => (
+                                {tablesLoading ? <p>Loading tables...</p> : tableCount > 0 && tablesData.map((table : Table) => (
                                     <div key={table.id}>
                                         <TableTab key={table.id} table={table} />
                                     </div>
@@ -135,7 +35,7 @@ export default function TablesAddControlsContainer({base} : { base : Base}) {
                             </div>
                             <div className="flex-none flex relative">
                                 <button onClick={() => {
-                                    createTable({
+                                    createTable.mutate({
                                         name: newTableName,
                                         baseid: base?.id ?? ""
                                     } ,
