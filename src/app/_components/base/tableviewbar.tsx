@@ -4,9 +4,10 @@ import Image from "next/image";
 
 interface TableViewBarProps {
     toggleFindBar: () => void;
+    toggleHideFieldsBar: () => void;
 }
 
-export default function TableViewBar({ toggleFindBar } : TableViewBarProps) {
+export default function TableViewBar({ toggleFindBar, toggleHideFieldsBar } : TableViewBarProps) {
     return (
         <div className="flex flex-none h-11 z-10">
             <div className="flex-none flex items-center">
@@ -42,7 +43,7 @@ export default function TableViewBar({ toggleFindBar } : TableViewBarProps) {
                         <div className="flex items-center">
                             <div className="flex flex-row mr-2">
                                 <div>
-                                    <button className="mr-2 focus-visible hover:bg-[rgb(242,242,242)]">
+                                    <button onClick={toggleHideFieldsBar} className="mr-2 focus-visible hover:bg-[rgb(242,242,242)]">
                                         <div className="pointer flex items-center px-2 rounded-full py-1">
                                             <Image src="eye-slash-visibility-visible-hide-hidden-show-watch-svgrepo-com.svg" alt="." width={16} height={16} />
                                             <div className="ml-1 text-[13px]">Hide fields</div>

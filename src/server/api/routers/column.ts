@@ -33,6 +33,28 @@ export const columnRouter = createTRPCRouter({
         
         return convertedData;
     }),
+    
+  // getFilteredColsByRowId: publicProcedure
+  //   .input(z.object({ fieldnames: z.string().array() }))
+  //   .query(async ({ input, ctx }) => {
+  //       const { data, error } = await ctx.supabase
+  //         .schema('public')
+  //         .from('columns')
+  //         .select('*')
+  //         .eq('rowid', input.rowid);
+
+  //       if (error) {
+  //         throw new Error(error.message);
+  //       }
+
+  //       const convertedData = data.map(item => ({
+  //         ...item,
+  //         createdat: item.createdat ? new Date(item.createdat) : null,
+  //         updatedat: item.updatedat ? new Date(item.updatedat) : null,
+  //       }));
+        
+  //       return convertedData;
+  //   }),
 
   
   createNewCol: publicProcedure

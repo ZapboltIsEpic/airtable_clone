@@ -1,5 +1,5 @@
 import { useSearchParams } from "next/navigation";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { type CellContext, flexRender, getCoreRowModel, getSortedRowModel, useReactTable } from "@tanstack/react-table";
 import Image from "next/image";
 import FindBarContainer from "./findbarcontainer";
@@ -7,6 +7,7 @@ import { useTableGetAllRowsAndColumnsQuery } from "~/app/services/table";
 import { useCreateColumnMutation, useUpdateColumnContent } from "~/app/services/column";
 import { useCreateRowMutation } from "~/app/services/row";
 import { useMemo } from "react";
+import HideFieldsContainer from "./hidefieldscontainer";
 
 const createRowsAndColumns = (typedData: RowWithColumns[], rowIds: string[]) => {
   const rows: Record<string, string>[] = [];
@@ -29,6 +30,7 @@ const createRowsAndColumns = (typedData: RowWithColumns[], rowIds: string[]) => 
 interface TableMainContainerProps {
   showFindBar: boolean;
   toggleFindBar: () => void;
+  showHideFieldsBar: boolean;
 }
 
 type RowWithColumns = {
@@ -55,7 +57,7 @@ type RowWithColumns = {
 //   cell: ({ getValue, row, column }: CellContext<Record<string, string>, string>) => JSX.Element;
 // }
 
-export default function TableMainContainer({ showFindBar, toggleFindBar } : TableMainContainerProps) {
+export default function TableMainContainer({ showFindBar, toggleFindBar, showHideFieldsBar } : TableMainContainerProps) {
   const queryClient = useQueryClient();
   const searchParams = useSearchParams();
   const tableId = searchParams.get("tableid");
@@ -64,10 +66,17 @@ export default function TableMainContainer({ showFindBar, toggleFindBar } : Tabl
   const rowids: string[] = [];
   const { rows, fieldNames: fieldnames } = createRowsAndColumns(typedData, rowids);
   const mutation = useUpdateColumnContent(tableId ?? "");
+  const { data: visibleColumns = {} } = useQuery(
+    {
+        queryKey: ["visibleColumns", tableId],
+        queryFn: () => queryClient.getQueryData<Record<string, boolean>>(["visibleColumns", tableId]) ?? {}
+    }
+);
+  const filteredFieldNames = fieldnames.filter((fieldname) => visibleColumns[fieldname] ?? true);
 
   console.log("hi i rerendered fucker");
 
-  const tableColumns = fieldnames.map((fieldname) => ({
+  const tableColumns = filteredFieldNames.map((fieldname) => ({
     header: fieldname,
     accessorKey: fieldname,
     cell: ({ getValue, row, column }: CellContext<Record<string, string>, string>) => {
@@ -130,10 +139,13 @@ export default function TableMainContainer({ showFindBar, toggleFindBar } : Tabl
       : { rows: [] }; 
   }, [tableRowsAndColumnsLoading, tableRowsAndColumns, table]);
 
+  queryClient.setQueryData(["fieldNames", tableId], fieldnames);
+
   return (
     <div className="h-full w-full">
       <div className="flex h-[calc(100vh-132px)] flex-row">
         <div className="h-full w-full border border-gray-300">
+          {showHideFieldsBar && <HideFieldsContainer tableid={tableId ?? ""} />}
           {showFindBar && <FindBarContainer toggleFindBar={toggleFindBar} />}
           {tableRowsAndColumnsLoading ? <p>Loading table info...</p> :
             <table className="table-fixed border-collapse overflow-scroll">
