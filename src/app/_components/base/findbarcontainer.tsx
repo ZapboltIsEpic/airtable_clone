@@ -1,11 +1,18 @@
 import Image from "next/image";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface FindBarProps {
     toggleFindBar: () => void;
-    setSearchTerm: (value: string) => void;
 }
 
-export default function FindBarContainer({ toggleFindBar, setSearchTerm } : FindBarProps) {
+export default function FindBarContainer({ toggleFindBar }: FindBarProps) {
+    const queryClient = useQueryClient();
+
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const searchTerm = e.target.value;
+        queryClient.setQueryData(["searchTerm"], searchTerm);
+    };
+
     return (
         <div className="relative">
             <div className="mr-2 rounded-bottom absolute top-0 right-0 border flex flex-col w-[300px] z-50">
@@ -14,9 +21,8 @@ export default function FindBarContainer({ toggleFindBar, setSearchTerm } : Find
                         type="text"
                         className="p-2 flex-auto font-medium text-[13px]"
                         placeholder="Find in view" 
-                        onChange={(e) => setSearchTerm(e.target.value)}
+                        onChange={handleSearchChange}
                     />
-                    <div className="flex items-center pr-2 z-20"></div>
                     <button onClick={toggleFindBar} className="flex flex-none items-center px-2 z-20">
                         <Image src="cross-svgrepo-com.svg" alt="X" width={16} height={16} />
                     </button>
@@ -26,5 +32,5 @@ export default function FindBarContainer({ toggleFindBar, setSearchTerm } : Find
                 </div>
             </div>
         </div>
-    )
+    );
 }

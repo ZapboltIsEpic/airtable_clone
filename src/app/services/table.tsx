@@ -45,3 +45,12 @@ export const useCreateTableMutation = () => {
         },
     });
 }
+
+export const useTableGetAllRowsAndColumnsQuery = (tableId?: string) => {
+    const { data, isLoading, error } = api.table.getTableRowsAndColumns.useQuery(
+        { tableid: tableId! }, 
+        { enabled: !!tableId } 
+    );
+
+    return { data, isLoading, error };
+};
