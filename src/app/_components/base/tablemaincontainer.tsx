@@ -8,6 +8,8 @@ import { useCreateColumnMutation, useUpdateColumnContent } from "~/app/services/
 import { useCreateRowMutation } from "~/app/services/row";
 import { useMemo } from "react";
 import HideFieldsContainer from "./hidefieldscontainer";
+import FilterBarContainer from "./filterbarcontainer";
+import SortBarContainer from "./sortbarcontainer";
 
 const createRowsAndColumns = (typedData: RowWithColumns[], rowIds: string[]) => {
   const rows: Record<string, string>[] = [];
@@ -31,6 +33,8 @@ interface TableMainContainerProps {
   showFindBar: boolean;
   toggleFindBar: () => void;
   showHideFieldsBar: boolean;
+  showFilterBar: boolean;
+  showSortBar: boolean;
 }
 
 type RowWithColumns = {
@@ -57,7 +61,7 @@ type RowWithColumns = {
 //   cell: ({ getValue, row, column }: CellContext<Record<string, string>, string>) => JSX.Element;
 // }
 
-export default function TableMainContainer({ showFindBar, toggleFindBar, showHideFieldsBar } : TableMainContainerProps) {
+export default function TableMainContainer({ showFindBar, toggleFindBar, showHideFieldsBar, showFilterBar, showSortBar } : TableMainContainerProps) {
   const queryClient = useQueryClient();
   const searchParams = useSearchParams();
   const tableId = searchParams.get("tableid");
@@ -146,6 +150,8 @@ export default function TableMainContainer({ showFindBar, toggleFindBar, showHid
       <div className="flex h-[calc(100vh-132px)] flex-row">
         <div className="h-full w-full border border-gray-300">
           {showHideFieldsBar && <HideFieldsContainer tableid={tableId ?? ""} />}
+          {showFilterBar && <FilterBarContainer />}
+          {showSortBar && <SortBarContainer />}
           {showFindBar && <FindBarContainer toggleFindBar={toggleFindBar} />}
           {tableRowsAndColumnsLoading ? <p>Loading table info...</p> :
             <table className="table-fixed border-collapse overflow-scroll">

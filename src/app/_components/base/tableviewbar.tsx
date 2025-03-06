@@ -5,9 +5,11 @@ import Image from "next/image";
 interface TableViewBarProps {
     toggleFindBar: () => void;
     toggleHideFieldsBar: () => void;
+    toggleSortBar: () => void;
+    toggleFilterBar: () => void;
 }
 
-export default function TableViewBar({ toggleFindBar, toggleHideFieldsBar } : TableViewBarProps) {
+export default function TableViewBar({ toggleFindBar, toggleHideFieldsBar, toggleSortBar, toggleFilterBar } : TableViewBarProps) {
     return (
         <div className="flex flex-none h-11 z-10">
             <div className="flex-none flex items-center">
@@ -50,7 +52,7 @@ export default function TableViewBar({ toggleFindBar, toggleHideFieldsBar } : Ta
                                         </div>
                                     </button>
                                 </div>
-                                <button className="hover:bg-[rgb(242,242,242)]">
+                                <button onClick={toggleFilterBar} className="hover:bg-[rgb(242,242,242)]">
                                     <div className="pointer flex items-center px-2 rounded-full py-1">
                                         <Image src="funnel-simple-thin-svgrepo-com.svg" alt="." width={16} height={16} />
                                         <div className="ml-1 text-[13px]">Filter</div>
@@ -67,7 +69,7 @@ export default function TableViewBar({ toggleFindBar, toggleHideFieldsBar } : Ta
                                     </button>
                                 </div>
                                 <div>
-                                    <button className="mr-2 focus-visible hover:bg-[rgb(242,242,242)]">
+                                    <button onClick={toggleSortBar} className="mr-2 focus-visible hover:bg-[rgb(242,242,242)]">
                                         <div className="pointer flex items-center px-2 rounded-full py-1">
                                             <Image src="arrows-down-up-duotone-svgrepo-com.svg" alt="." width={16} height={16} />
                                             <div className="ml-1 text-[13px]">Sort</div>
