@@ -78,7 +78,7 @@ export default function TableMainContainer({ showFindBar, toggleFindBar, showHid
 );
   const filteredFieldNames = fieldnames.filter((fieldname) => visibleColumns[fieldname] ?? true);
 
-  console.log("hi i rerendered fucker");
+  // console.log("hi i rerendered fucker");
 
   const tableColumns = filteredFieldNames.map((fieldname) => ({
     header: fieldname,
@@ -150,7 +150,7 @@ export default function TableMainContainer({ showFindBar, toggleFindBar, showHid
       <div className="flex h-[calc(100vh-132px)] flex-row">
         <div className="h-full w-full border border-gray-300">
           {showHideFieldsBar && <HideFieldsContainer tableid={tableId ?? ""} />}
-          {showFilterBar && <FilterBarContainer />}
+          {showFilterBar && <FilterBarContainer tableid={tableId ?? ""}/>}
           {showSortBar && <SortBarContainer />}
           {showFindBar && <FindBarContainer toggleFindBar={toggleFindBar} />}
           {tableRowsAndColumnsLoading ? <p>Loading table info...</p> :
@@ -199,6 +199,16 @@ export default function TableMainContainer({ showFindBar, toggleFindBar, showHid
                     }}>
                       <Image src="plus-svgrepo-com.svg" alt="+" width={16} height={16} />
                     </button>
+                  </td>
+                  <td className="border border-gray-300 text-xs font-normal p-0 w-[180px] h-[32px]">
+                    {/* <button onClick={() => {
+                        createNewRow.mutate({
+                          tableid: tableId ?? "",
+                          fieldnames: fieldnames,
+                        });
+                    }}> */}
+                      Add 1k rows
+                    {/* </button> */}
                   </td>
                 </tr>
               </tbody>
