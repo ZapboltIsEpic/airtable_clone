@@ -10,6 +10,8 @@ import { useMemo } from "react";
 import HideFieldsContainer from "./hidefieldscontainer";
 import FilterBarContainer from "./filterbarcontainer";
 import SortBarContainer from "./sortbarcontainer";
+// import { useVirtual } from '@tanstack/react-virtual';
+
 
 const createRowsAndColumns = (typedData: RowWithColumns[], rowIds: string[]) => {
   const rows: Record<string, string>[] = [];
@@ -181,6 +183,14 @@ export default function TableMainContainer({ showFindBar, toggleFindBar, showHid
 
   queryClient.setQueryData(["fieldNames", tableId], fieldnames);
 
+  // virtualizing rows.....
+  // const scrollRef = useRef(null);
+  // const virtualizer = useVirtualizer({
+  //   scrollRef,
+  //   count: rowModel.rows.length, // Total rows
+  //   overscan: 5, // Number of rows to render before and after the visible ones
+  // });
+
   return (
     <div className="h-full w-full">
       <div className="flex h-[calc(100vh-132px)] flex-row">
@@ -236,18 +246,16 @@ export default function TableMainContainer({ showFindBar, toggleFindBar, showHid
                       <Image src="plus-svgrepo-com.svg" alt="+" width={16} height={16} />
                     </button>
                   </td>
-                  <td className="border border-gray-300 text-xs font-normal p-0 w-[180px] h-[32px]">
-                    {/* <button onClick={() => {
-                      for (let i = 0; i < 1000; i++) {
+                  {/* <td className="border border-gray-300 text-xs font-normal p-0 w-[180px] h-[32px]">
+                    <button onClick={() => {
                         createNew1kRows.mutate({
                           tableid: tableId ?? "",
                           fieldnames: fieldnames,
                         });
-                      }
-                    }}> */}
+                    }}>
                       Add 1k rows
-                    {/* </button> */}
-                  </td>
+                    </button>
+                  </td> */}
                 </tr>
               </tbody>
             </table>
