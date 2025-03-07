@@ -54,3 +54,12 @@ export const useTableGetAllRowsAndColumnsQuery = (tableId?: string) => {
 
     return { data, isLoading, error };
 };
+
+export const useTableGetFilteredRowsAndColumnsQuery = (tableId?: string, filters?: { id: string; fieldname: string; operator: string; value: string }[]) => {
+    const { data, isLoading, error } = api.table.getTableFilteredRowsAndColumns.useQuery(
+        { tableid: tableId!, filters: filters! },
+        { enabled: !!tableId }
+    );
+
+    return { data, isLoading, error };
+}

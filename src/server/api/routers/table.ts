@@ -75,8 +75,128 @@ export const tableRouter = createTRPCRouter({
         throw error;
       }
     }),
+  
+    getTableFilteredRowsAndColumns: publicProcedure
+    .input(z.object({ 
+      tableid: z.string(),
+      filters: z.array(
+        z.object({
+          id: z.union([z.string(), z.number().transform(num => num.toString())]),
+          fieldname: z.string(),
+          operator: z.string(),
+          value: z.string(),
+        })
+      ).optional(),
+     }))
+    .query(async ({ input, ctx }) => {
+      const { tableid, filters } = input;
 
-    // should be protected but doesnt work for some reason?
+      let query = ctx.supabase
+        .schema('public')
+        .from('rows')
+        .select('*')
+        .eq('tableid', tableid);
+
+      let rows: Row[] = [];
+      if (filters && filters.length > 0) {
+        const { data: rowsData, error: rowsError } = await ctx.supabase
+          .schema('public')
+          .from('rows')
+          .select('*')
+          .eq('tableid', tableid);
+
+        if (rowsError) {
+          throw new Error(rowsError.message);
+        }
+
+        rows = rowsData as Row[];
+
+        const { data: columnsData, error: columnsError } = await ctx.supabase
+          .schema('public')
+          .from('columns')
+          .select('*')
+          .in('rowid', rows.map(row => row.id));
+
+        if (columnsError) {
+          throw new Error(columnsError.message);
+        }
+
+        const filteredRowIds = new Set<string>();
+
+        rows.forEach(row => {
+          const rowColumns = columnsData.filter(column => column.rowid === row.id);
+          let rowMatches = true;
+
+          filters.forEach(filter => {
+        const { fieldname, operator, value } = filter;
+        const column = rowColumns.find(col => col.fieldname === fieldname);
+
+        if (!column) {
+          rowMatches = false;
+          return;
+        }
+
+        switch (operator) {
+          case 'contains':
+            if (!column.columncontent.includes(value)) rowMatches = false;
+            break;
+          case 'does not contain':
+            if (column.columncontent.includes(value)) rowMatches = false;
+            break;
+          case 'is':
+            if (column.columncontent !== value) rowMatches = false;
+            break;
+          case 'is not':
+            if (column.columncontent === value) rowMatches = false;
+            break;
+          case 'is empty':
+            if (column.columncontent !== null) rowMatches = false;
+            break;
+          case 'is not empty':
+            if (column.columncontent === null) rowMatches = false;
+            break;
+          default:
+            break;
+        }
+          });
+
+          if (rowMatches) {
+        filteredRowIds.add(row.id);
+          }
+        });
+
+        query = query.in('id', Array.from(filteredRowIds));
+      }
+
+      const { data: rowsData, error } = await query;
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      const columnsPromises = rowsData.map(async (row) => {
+        const typedRow: Row = {
+          ...row,
+          createdat: row.createdat ? new Date(row.createdat) : null,
+          updatedat: row.updatedat ? new Date(row.updatedat) : null,
+        };
+        const { data: columns, error: columnError } = await ctx.supabase
+          .schema('public')
+          .from('columns')
+          .select('*')
+          .eq('rowid', row.id);
+
+        if (columnError) {
+          throw new Error(columnError.message);
+        }
+
+        return { row: typedRow, columns };
+      });
+
+      const rowsWithColumns = await Promise.all(columnsPromises);
+      return rowsWithColumns;
+    }),
+
   create: publicProcedure
     .input(z.object({ 
         name: z.string(),

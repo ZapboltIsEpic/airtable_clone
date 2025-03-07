@@ -45,3 +45,55 @@ export const useCreateRowMutation = () => {
         },
     });
 }
+
+export const useCreate1kRowsMutation = () => {
+    const ctx = api.useUtils();
+
+    return api.row.createNewRow.useMutation({
+        onMutate: async (newRowsData: { tableid: string; fieldnames: string[] }) => {
+            await ctx.table.getTableRowsAndColumns.cancel();
+
+            const previousTableRowsAndColumns = ctx.table.getTableRowsAndColumns.getData({ tableid: newRowsData.tableid });
+
+            const newTempRows = Array.from({ length: 1000 }, (_, i) => {
+                const rowId = `temp-${Date.now()}-${i}`;
+                const columns = newRowsData.fieldnames.map((fieldname, index) => ({
+                    columncontent: "",
+                    createdat: new Date().toISOString(),
+                    fieldname,
+                    id: `temp-col-${Date.now()}-${index}-${i}`,
+                    numberedid: index + 1,
+                    rowid: rowId,
+                    updatedat: new Date().toISOString(),
+                }));
+
+                return {
+                    row: {
+                        id: rowId,
+                        tableid: newRowsData.tableid,
+                        createdat: new Date(),
+                        updatedat: new Date(),
+                    },
+                    columns,
+                };
+            });
+            
+            const newTableRowsAndColumns = [...(previousTableRowsAndColumns ?? []), ...newTempRows];
+            ctx.table.getTableRowsAndColumns.setData({ tableid: newRowsData.tableid }, newTableRowsAndColumns);
+
+            return { previousTableRowsAndColumns };
+        },
+        onError: (error, newRowsData, context) => {
+            console.error("Error creating rows:", error);
+            if (context?.previousTableRowsAndColumns) {
+                ctx.table.getTableRowsAndColumns.setData({ tableid: newRowsData.tableid }, context.previousTableRowsAndColumns);
+            }
+        },
+        onSuccess: () => {
+            console.log("Successfully created 1000 rows");
+        },
+        onSettled: async () => {
+            await ctx.table.getTableRowsAndColumns.invalidate();
+        },
+    });
+};

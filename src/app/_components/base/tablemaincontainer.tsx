@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { type CellContext, flexRender, getCoreRowModel, getSortedRowModel, useReactTable } from "@tanstack/react-table";
 import Image from "next/image";
 import FindBarContainer from "./findbarcontainer";
-import { useTableGetAllRowsAndColumnsQuery } from "~/app/services/table";
+import { useTableGetFilteredRowsAndColumnsQuery } from "~/app/services/table";
 import { useCreateColumnMutation, useUpdateColumnContent } from "~/app/services/column";
 import { useCreateRowMutation } from "~/app/services/row";
 import { useMemo } from "react";
@@ -65,10 +65,7 @@ export default function TableMainContainer({ showFindBar, toggleFindBar, showHid
   const queryClient = useQueryClient();
   const searchParams = useSearchParams();
   const tableId = searchParams.get("tableid");
-  const { data : tableRowsAndColumns, isLoading : tableRowsAndColumnsLoading } = useTableGetAllRowsAndColumnsQuery(tableId ?? "");
-  const typedData = tableRowsAndColumns as unknown as RowWithColumns[];
-  const rowids: string[] = [];
-  const { rows, fieldNames: fieldnames } = createRowsAndColumns(typedData, rowids);
+  // const { data : tableRowsAndColumns, isLoading : tableRowsAndColumnsLoading } = useTableGetAllRowsAndColumnsQuery(tableId ?? "");
   const mutation = useUpdateColumnContent(tableId ?? "");
   const { data: visibleColumns = {} } = useQuery(
     {
@@ -82,32 +79,37 @@ export default function TableMainContainer({ showFindBar, toggleFindBar, showHid
         queryFn: () => queryClient.getQueryData<{ id: string; fieldname: string; operator: string; value: string }[]>(["filters", tableId]) ?? []
     }
   );
-
+  const { data : tableRowsAndColumns, isLoading : tableRowsAndColumnsLoading } = useTableGetFilteredRowsAndColumnsQuery(tableId ?? "", filters);
+  const typedData = tableRowsAndColumns as unknown as RowWithColumns[];
+  const rowids: string[] = [];
+  const { rows, fieldNames: fieldnames } = createRowsAndColumns(typedData, rowids);
   const filteredFieldNames = fieldnames.filter((fieldname) => visibleColumns[fieldname] ?? true);
-  const filteredRows = rows.filter((row) => {
-    return filters.every((filter) => {
-      const rowValue = row[filter.fieldname];
-
-      if (filter.value === "") return true;
   
-      switch (filter.operator) {
-        case "contains":
-          return rowValue?.includes(filter.value);
-        case "does not contain":
-          return !rowValue?.includes(filter.value);
-        case "is":
-          return rowValue === filter.value;
-        case "is not":
-          return rowValue !== filter.value;
-        case "is empty":
-          return rowValue === "";
-        case "is not empty":
-          return rowValue !== "";
-        default:
-          return true;
-      }
-    });
-  });
+  // Frontend filtering
+  // const filteredRows = rows.filter((row) => {
+  //   return filters.every((filter) => {
+  //     const rowValue = row[filter.fieldname];
+
+  //     if (filter.value === "") return true;
+  
+  //     switch (filter.operator) {
+  //       case "contains":
+  //         return rowValue?.includes(filter.value);
+  //       case "does not contain":
+  //         return !rowValue?.includes(filter.value);
+  //       case "is":
+  //         return rowValue === filter.value;
+  //       case "is not":
+  //         return rowValue !== filter.value;
+  //       case "is empty":
+  //         return rowValue === "";
+  //       case "is not empty":
+  //         return rowValue !== "";
+  //       default:
+  //         return true;
+  //     }
+  //   });
+  // });
 
   // console.log("hi i rerendered fucker");
 
@@ -158,10 +160,11 @@ export default function TableMainContainer({ showFindBar, toggleFindBar, showHid
 
   const createNewCol = useCreateColumnMutation(tableId ?? "");
   const createNewRow = useCreateRowMutation();
+  // const createNew1kRows = useCreate1kRowsMutation();
 
   const table = useReactTable({
     columns : tableColumns,
-    data: filteredRows,
+    data: rows,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     manualSorting: true, 
@@ -235,10 +238,12 @@ export default function TableMainContainer({ showFindBar, toggleFindBar, showHid
                   </td>
                   <td className="border border-gray-300 text-xs font-normal p-0 w-[180px] h-[32px]">
                     {/* <button onClick={() => {
-                        createNewRow.mutate({
+                      for (let i = 0; i < 1000; i++) {
+                        createNew1kRows.mutate({
                           tableid: tableId ?? "",
                           fieldnames: fieldnames,
                         });
+                      }
                     }}> */}
                       Add 1k rows
                     {/* </button> */}
