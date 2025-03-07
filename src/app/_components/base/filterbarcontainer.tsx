@@ -2,11 +2,13 @@ import Image from "next/image";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import FieldNamesFilterBarContainer from "./filterbar/fieldnamesfilterbarcontainer";
 import { useState } from "react";
+import OperatorFilterBarContainer from "./filterbar/operatorfilterbarcontainer";
 
 export default function FilterBarContainer({ tableid }: { tableid: string }) {
     const queryClient = useQueryClient();
     const fieldnames = queryClient.getQueryData<string[]>(["fieldNames", tableid]) ?? [];
     const [showFieldNamesFilterBarContainer, setShowFieldNamesFilterBarContainer] = useState<string | null>(null);
+    const [showOperatorsFilterBarContainer, setShowOperatorsFilterBarContainer] = useState<string | null>(null);
 
     const toggleShowFieldNamesFilterBarContainer = (id : string) => {
         if (showFieldNamesFilterBarContainer === id) {
@@ -17,7 +19,14 @@ export default function FilterBarContainer({ tableid }: { tableid: string }) {
         }
     }
 
-    const operators = ["contains", "does not contain", "is", "is not", "is empty", "is not empty"];
+    const toggleShowOperatorsFilterBarContainer = (id : string) => {
+        if (showOperatorsFilterBarContainer === id) {
+            setShowOperatorsFilterBarContainer(null);
+        }
+        else {
+            setShowOperatorsFilterBarContainer(id);
+        }
+    }
 
     const { data: filters = [] } = useQuery(
         {
@@ -25,8 +34,6 @@ export default function FilterBarContainer({ tableid }: { tableid: string }) {
             queryFn: () => queryClient.getQueryData<{ id: string; fieldname: string; operator: string; value: string }[]>(["filters", tableid]) ?? []
         }
     );
-
-    console.log(filters);
 
     const addFilter = async () => {
         queryClient.setQueryData(["filters", tableid], [
@@ -37,14 +44,30 @@ export default function FilterBarContainer({ tableid }: { tableid: string }) {
         console.log("revalidated?")
     }
 
+    const deleteFilter = async (filterId: string) => {
+        queryClient.setQueryData(["filters", tableid], filters.filter(filter => filter.id !== filterId));
+        
+        await queryClient.invalidateQueries({ queryKey: ["filters", tableid] });
+        console.log("Deleted filter:", filterId);
+    };
+
+    const updateFilterValue = async (filterId: string, value: string) => {
+        const updatedFilters = filters.map((filter) => 
+            filter.id === filterId ? { ...filter, value } : filter
+        );
+    
+        queryClient.setQueryData(["filters", tableid], updatedFilters);
+        await queryClient.invalidateQueries({ queryKey: ["filters", tableid]});
+    }
+
     return (
         <div className="fixed inset-y-[127px] left-[394px] z-10 max-h-[768px] max-w-[947.031px] bg-white opacity-100 shadow-lg text-[13px]">
             <div className="px-4 pt-3 text-gray-600">In this view, show records</div>
-            <div className="px-4 pt-3 overflow-auto max-h-[425px]">
+            <div className="px-4 pt-3 max-h-[425px]">
                 <div className="mb-2">
                     <div className="flex flex-col relative text-dark w-[calc(390px+10.5rem)]">
                         {filters.map((filter) => (
-                            <div key={filter.id} className="h-10 w-full">
+                            <div key={filter.id} className="h-10 w-full relative">
                                 <div className="flex h-full">
                                     <div className="flex items-center px-2 pb-2">
                                         <div className="flex items-center flex-auto px-2 w-full h-full">Where</div>
@@ -66,13 +89,16 @@ export default function FilterBarContainer({ tableid }: { tableid: string }) {
                                                             </div>
                                                         </button>
                                                         {showFieldNamesFilterBarContainer === filter.id && (
-                                                            <FieldNamesFilterBarContainer fieldnames={fieldnames} />
+                                                            <FieldNamesFilterBarContainer fieldnames={fieldnames} tableid={tableid} filterid={filter.id} />
                                                         )}
                                                     </div>
                                                 </div>
                                                 <div className="flex-none flex items-stretch w-1/2 border-r border-gray-300">
                                                     <div className="flex flex-auto">
-                                                        <button className="flex items-center px-2 rounded text-blue-600 hover:bg-gray-100 w-full">
+                                                        <button 
+                                                            className="flex items-center px-2 rounded text-blue-600 hover:bg-gray-100 w-full"
+                                                            onClick={() => toggleShowOperatorsFilterBarContainer(filter.id)}
+                                                        >
                                                             <div className="truncate flex-auto text-left">{filter.operator}</div>
                                                             <div className="flex-none flex items-center ml-1">
                                                                 <svg className="w-4 h-4 flex-none ml-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -80,17 +106,26 @@ export default function FilterBarContainer({ tableid }: { tableid: string }) {
                                                                 </svg>
                                                             </div>
                                                         </button>
+                                                        {showOperatorsFilterBarContainer === filter.id && (
+                                                            <OperatorFilterBarContainer tableid={tableid} filterid={filter.id} />
+                                                        )}
                                                     </div>
                                                 </div>
                                             </div>
                                             <div className="flex-auto flex items-stretch overflow-hidden focus-within:border-r border-gray-300">
                                                 <span className="relative flex-auto">
-                                                    <input placeholder="Enter a value" className="w-full px-2 py-1 truncate border-none focus:outline-none" />
+                                                    <input 
+                                                        placeholder="Enter a value" 
+                                                        value={filter.value}
+                                                        className="w-full px-2 py-1 truncate border-none focus:outline-none" 
+                                                        onChange={(e) => updateFilterValue(filter.id, e.target.value)}
+                                                    >
+                                                    </input>
                                                 </span>
                                             </div>
                                         </div>
                                         <div className="flex flex-none items-stretch">
-                                            <button className="flex-none flex justify-center items-center hover:bg-gray-100 border-r border-gray-300">
+                                            <button onClick={() => deleteFilter(filter.id)} className="flex-none flex justify-center items-center hover:bg-gray-100 border-r border-gray-300">
                                                 <Image src="/trash-svgrepo-com.svg" alt="." width={16} height={16} />
                                             </button>
                                             <button className="flex-none flex justify-center items-center hover:bg-gray-100 border-r border-gray-300">

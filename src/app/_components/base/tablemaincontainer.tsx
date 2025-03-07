@@ -75,8 +75,39 @@ export default function TableMainContainer({ showFindBar, toggleFindBar, showHid
         queryKey: ["visibleColumns", tableId],
         queryFn: () => queryClient.getQueryData<Record<string, boolean>>(["visibleColumns", tableId]) ?? {}
     }
-);
+  );
+  const { data: filters = [] } = useQuery(
+    {
+        queryKey: ["filters", tableId],
+        queryFn: () => queryClient.getQueryData<{ id: string; fieldname: string; operator: string; value: string }[]>(["filters", tableId]) ?? []
+    }
+  );
+
   const filteredFieldNames = fieldnames.filter((fieldname) => visibleColumns[fieldname] ?? true);
+  const filteredRows = rows.filter((row) => {
+    return filters.every((filter) => {
+      const rowValue = row[filter.fieldname];
+
+      if (filter.value === "") return true;
+  
+      switch (filter.operator) {
+        case "contains":
+          return rowValue?.includes(filter.value);
+        case "does not contain":
+          return !rowValue?.includes(filter.value);
+        case "is":
+          return rowValue === filter.value;
+        case "is not":
+          return rowValue !== filter.value;
+        case "is empty":
+          return rowValue === "";
+        case "is not empty":
+          return rowValue !== "";
+        default:
+          return true;
+      }
+    });
+  });
 
   // console.log("hi i rerendered fucker");
 
@@ -125,23 +156,25 @@ export default function TableMainContainer({ showFindBar, toggleFindBar, showHid
     }
   }
 
-
   const createNewCol = useCreateColumnMutation(tableId ?? "");
   const createNewRow = useCreateRowMutation();
 
   const table = useReactTable({
     columns : tableColumns,
-    data: rows,
+    data: filteredRows,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     manualSorting: true, 
   });
 
   const rowModel = useMemo(() => {
+    if (filters) {
+      
+    }
     return !tableRowsAndColumnsLoading && tableRowsAndColumns
       ? table.getRowModel()
       : { rows: [] }; 
-  }, [tableRowsAndColumnsLoading, tableRowsAndColumns, table]);
+  }, [tableRowsAndColumnsLoading, tableRowsAndColumns, table, filters]);
 
   queryClient.setQueryData(["fieldNames", tableId], fieldnames);
 
