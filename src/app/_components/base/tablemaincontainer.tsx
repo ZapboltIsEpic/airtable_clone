@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { type CellContext, flexRender, getCoreRowModel, getSortedRowModel, useReactTable } from "@tanstack/react-table";
 import Image from "next/image";
 import FindBarContainer from "./findbarcontainer";
-import { useTableGetFilteredRowsAndColumnsQuery, useTablesQuery } from "~/app/services/table";
+import { useTableGetAllRowsAndColumnsQuery, useTablesQuery } from "~/app/services/table";
 import { useCreateColumnMutation, useUpdateColumnContent } from "~/app/services/column";
 import { useCreateRowMutation } from "~/app/services/row";
 import { useMemo } from "react";
@@ -79,7 +79,7 @@ export default function TableMainContainer({ showFindBar, toggleFindBar, showHid
       }
   }
 
-  // const { data : tableRowsAndColumns, isLoading : tableRowsAndColumnsLoading } = useTableGetAllRowsAndColumnsQuery(tableId ?? "");
+  const { data : tableRowsAndColumns, isLoading : tableRowsAndColumnsLoading } = useTableGetAllRowsAndColumnsQuery(tableId ?? "");
   const mutation = useUpdateColumnContent(tableId ?? "");
   const { data: visibleColumns = {} } = useQuery(
     {
@@ -93,37 +93,40 @@ export default function TableMainContainer({ showFindBar, toggleFindBar, showHid
         queryFn: () => queryClient.getQueryData<{ id: string; fieldname: string; operator: string; value: string }[]>(["filters", tableId]) ?? []
     }
   );
-  const { data : tableRowsAndColumns, isLoading : tableRowsAndColumnsLoading } = useTableGetFilteredRowsAndColumnsQuery(tableId ?? "", filters);
+  
+  // BACKEND FILTERING
+  // const { data : tableRowsAndColumns, isLoading : tableRowsAndColumnsLoading } = useTableGetFilteredRowsAndColumnsQuery(tableId ?? "", filters);
+
   const typedData = tableRowsAndColumns as unknown as RowWithColumns[];
   const rowids: string[] = [];
   const { rows, fieldNames: fieldnames } = createRowsAndColumns(typedData, rowids);
   const filteredFieldNames = fieldnames.filter((fieldname) => visibleColumns[fieldname] ?? true);
   
   // Frontend filtering
-  // const filteredRows = rows.filter((row) => {
-  //   return filters.every((filter) => {
-  //     const rowValue = row[filter.fieldname];
+  const filteredRows = rows.filter((row) => {
+    return filters.every((filter) => {
+      const rowValue = row[filter.fieldname];
 
-  //     if (filter.value === "") return true;
+      if (filter.value === "") return true;
   
-  //     switch (filter.operator) {
-  //       case "contains":
-  //         return rowValue?.includes(filter.value);
-  //       case "does not contain":
-  //         return !rowValue?.includes(filter.value);
-  //       case "is":
-  //         return rowValue === filter.value;
-  //       case "is not":
-  //         return rowValue !== filter.value;
-  //       case "is empty":
-  //         return rowValue === "";
-  //       case "is not empty":
-  //         return rowValue !== "";
-  //       default:
-  //         return true;
-  //     }
-  //   });
-  // });
+      switch (filter.operator) {
+        case "contains":
+          return rowValue?.includes(filter.value);
+        case "does not contain":
+          return !rowValue?.includes(filter.value);
+        case "is":
+          return rowValue === filter.value;
+        case "is not":
+          return rowValue !== filter.value;
+        case "is empty":
+          return rowValue === "";
+        case "is not empty":
+          return rowValue !== "";
+        default:
+          return true;
+      }
+    });
+  });
 
   // console.log("hi i rerendered fucker");
 
@@ -178,7 +181,7 @@ export default function TableMainContainer({ showFindBar, toggleFindBar, showHid
 
   const table = useReactTable({
     columns : tableColumns,
-    data: rows,
+    data: filteredRows,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     manualSorting: true, 

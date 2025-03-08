@@ -4,9 +4,9 @@ export const useCreateRowMutation = () => {
     const ctx = api.useUtils(); 
     return api.row.createNewRow.useMutation({
         onMutate: async (newRow: { tableid: string; fieldnames: string[] }) => {
-            await ctx.table.getTableFilteredRowsAndColumns.cancel();
+            await ctx.table.getTableRowsAndColumns.cancel();
 
-            const previousTableRowsAndColumns = ctx.table.getTableFilteredRowsAndColumns.getData({ tableid: newRow.tableid });
+            const previousTableRowsAndColumns = ctx.table.getTableRowsAndColumns.getData({ tableid: newRow.tableid });
 
             const newTempRow = {
                 row: {
@@ -27,21 +27,21 @@ export const useCreateRowMutation = () => {
             };
 
             const newTableRowsAndColumns = [...(previousTableRowsAndColumns ?? []), newTempRow];
-            ctx.table.getTableFilteredRowsAndColumns.setData({ tableid: newRow.tableid }, newTableRowsAndColumns);
+            ctx.table.getTableRowsAndColumns.setData({ tableid: newRow.tableid }, newTableRowsAndColumns);
 
             return { previousTableRowsAndColumns }
         },
         onError: (error, newRow, context) => {
             console.error("Error creating table:", error);
             if (context?.previousTableRowsAndColumns) {
-              ctx.table.getTableFilteredRowsAndColumns.setData({ tableid: newRow.tableid }, context.previousTableRowsAndColumns);
+              ctx.table.getTableRowsAndColumns.setData({ tableid: newRow.tableid }, context.previousTableRowsAndColumns);
             }
         },
         onSuccess: () => {
             console.log("success");
         },
         onSettled: async () => {
-            await ctx.table.getTableFilteredRowsAndColumns.invalidate();
+            await ctx.table.getTableRowsAndColumns.invalidate();
         },
     });
 }
@@ -51,9 +51,9 @@ export const useCreate1kRowsMutation = () => {
 
     return api.row.createNew1kRows.useMutation({
         onMutate: async (newRowsData: { tableid: string; fieldnames: string[] }) => {
-            await ctx.table.getTableFilteredRowsAndColumns.cancel();
+            await ctx.table.getTableRowsAndColumns.cancel();
 
-            const previousTableRowsAndColumns = ctx.table.getTableFilteredRowsAndColumns.getData({ tableid: newRowsData.tableid });
+            const previousTableRowsAndColumns = ctx.table.getTableRowsAndColumns.getData({ tableid: newRowsData.tableid });
 
             const newTempRows = Array.from({ length: 1000 }, (_, i) => {
                 const rowId = `temp-${Date.now()}-${i}`;
@@ -79,21 +79,21 @@ export const useCreate1kRowsMutation = () => {
             });
 
             const newTableRowsAndColumns = [...(previousTableRowsAndColumns ?? []), ...newTempRows];
-            ctx.table.getTableFilteredRowsAndColumns.setData({ tableid: newRowsData.tableid }, newTableRowsAndColumns);
+            ctx.table.getTableRowsAndColumns.setData({ tableid: newRowsData.tableid }, newTableRowsAndColumns);
 
             return { previousTableRowsAndColumns };
         },
         onError: (error, newRowsData, context) => {
             console.error("Error creating rows:", error);
             if (context?.previousTableRowsAndColumns) {
-                ctx.table.getTableFilteredRowsAndColumns.setData({ tableid: newRowsData.tableid }, context.previousTableRowsAndColumns);
+                ctx.table.getTableRowsAndColumns.setData({ tableid: newRowsData.tableid }, context.previousTableRowsAndColumns);
             }
         },
         onSuccess: () => {
             console.log("Successfully created 1000 rows");
         },
         onSettled: async () => {
-            await ctx.table.getTableFilteredRowsAndColumns.invalidate();
+            await ctx.table.getTableRowsAndColumns.invalidate();
         },
     });
 };
