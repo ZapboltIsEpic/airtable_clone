@@ -128,7 +128,7 @@ export default function TableMainContainer({ showFindBar, toggleFindBar, showHid
     });
   });
 
-  // console.log("hi i rerendered fucker");
+  // console.log("hi i rerendered");
 
   const tableColumns = filteredFieldNames.map((fieldname) => ({
     header: fieldname,
@@ -138,6 +138,7 @@ export default function TableMainContainer({ showFindBar, toggleFindBar, showHid
       const initialValue = getValue();
   
       const onBlur = (value: string) => {
+        console.log(value);
         if (value !== initialValue) {
           mutation.mutate({
             rowid: rowids[row.index] ?? "",
@@ -156,8 +157,7 @@ export default function TableMainContainer({ showFindBar, toggleFindBar, showHid
         <input
           id={`editable-cell-${row.index}-${column.id}`}
           name={`editable-cell-${row.index}-${column.id}`}
-          value={initialValue}
-          onChange={(e) => onBlur(e.target.value)}
+          defaultValue={initialValue}
           onBlur={(e) => onBlur(e.target.value)}
           className={`w-full h-full outline-none ${
             isHighlighted ? "bg-[rgb(255,243,211)]" : ""
@@ -167,8 +167,14 @@ export default function TableMainContainer({ showFindBar, toggleFindBar, showHid
     },
   }));
 
+  const { data: searchTerm } = useQuery(
+    {
+      queryKey: ["searchTerm"],
+      queryFn: () => queryClient.getQueryData<string>(["searchTerm"]) ?? ""
+    }
+  );
 
-  if (queryClient.getQueryData(["searchTerm"])) {
+  if (searchTerm && searchTerm.length > 0) {
     const firstHighlightedElement = document.querySelector('[data-highlighted="true"]');
     if (firstHighlightedElement) {
       firstHighlightedElement.scrollIntoView({ behavior: "smooth", block: "center" });

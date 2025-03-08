@@ -8,9 +8,10 @@ interface FindBarProps {
 export default function FindBarContainer({ toggleFindBar }: FindBarProps) {
     const queryClient = useQueryClient();
 
-    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleSearchChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const searchTerm = e.target.value;
         queryClient.setQueryData(["searchTerm"], searchTerm);
+        await queryClient.invalidateQueries({ queryKey: ["searchTerm"] })
     };
 
     return (
@@ -18,6 +19,7 @@ export default function FindBarContainer({ toggleFindBar }: FindBarProps) {
             <div className="mr-2 rounded-bottom absolute top-0 right-0 border flex flex-col w-[300px] z-50">
                 <div className="flex border-2">
                     <input 
+                        defaultValue={queryClient.getQueryData(["searchTerm"])}
                         type="text"
                         className="p-2 flex-auto font-medium text-[13px]"
                         placeholder="Find in view" 
