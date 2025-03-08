@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { type CellContext, flexRender, getCoreRowModel, getSortedRowModel, useReactTable } from "@tanstack/react-table";
 import Image from "next/image";
 import FindBarContainer from "./findbarcontainer";
-import { useTableGetFilteredRowsAndColumnsQuery } from "~/app/services/table";
+import { useTableGetFilteredRowsAndColumnsQuery, useTablesQuery } from "~/app/services/table";
 import { useCreateColumnMutation, useUpdateColumnContent } from "~/app/services/column";
 import { useCreateRowMutation } from "~/app/services/row";
 import { useMemo } from "react";
@@ -67,6 +67,18 @@ export default function TableMainContainer({ showFindBar, toggleFindBar, showHid
   const queryClient = useQueryClient();
   const searchParams = useSearchParams();
   const tableId = searchParams.get("tableid");
+  const rawBaseId = searchParams.get("baseid");
+  const baseId = rawBaseId?.replace(/^"|"$/g, '') ?? null; 
+
+  const { data: tables } = useTablesQuery(baseId ?? "");
+  if (tableId === null && tables && tables.length > 0) {
+      const newParams = new URLSearchParams(searchParams);
+      if (tables[0]?.id) {
+        newParams.set("tableid", tables[0].id);
+        window.location.href = `${window.location.pathname}?${newParams.toString()}`;
+      }
+  }
+
   // const { data : tableRowsAndColumns, isLoading : tableRowsAndColumnsLoading } = useTableGetAllRowsAndColumnsQuery(tableId ?? "");
   const mutation = useUpdateColumnContent(tableId ?? "");
   const { data: visibleColumns = {} } = useQuery(
