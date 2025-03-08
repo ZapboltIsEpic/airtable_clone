@@ -4,9 +4,7 @@ import Image from "next/image"
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-// import CreateBasePopUp from "createbasepopup";
-import { api } from "~/trpc/react";
-// import { useRouter } from "next/router";
+import { useCreateBaseMutation } from "~/app/services/base";
 
 interface Session {
     user: {
@@ -15,29 +13,19 @@ interface Session {
 }
 
 export default function HomeSideBar({ session, isExpanded }: { session: Session; isExpanded: boolean }) {
-
     const router = useRouter();
-
     const [isHovered, setIsHovered] = useState(false);
+
     const handleMouseEnter = () => {
         setIsHovered(true);
     };
-
     const handleMouseLeave = () => {
         setIsHovered(false);
     };
 
     const expanded = isHovered || isExpanded;
 
-    const { mutate: createBase } = api.base.create.useMutation({
-        onSuccess: (data) => {
-            console.log("base created successfully, redirecting...")
-            router.push(`/base?baseid=${data[0]?.baseid}&tableid=${data[0]?.id}`);
-        },
-        onError: (error) => {
-            console.error("Error creating base:", error);
-        },
-    });
+    const { mutate: createBase } = useCreateBaseMutation();
 
     return (
         <div onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
@@ -123,6 +111,14 @@ export default function HomeSideBar({ session, isExpanded }: { session: Session;
                                             name: "Untitled Base",
                                             workspace: "Default Workspace",
                                             userId: session?.user?.id ?? "",
+                                        },
+                                        {
+                                            onSuccess: (data) => {
+                                                if (data?.[0]?.baseid && data?.[0]?.id) {
+                                                    console.log("Redirecting to new base...");
+                                                    void router.push(`/base?baseid=${data[0].baseid}&tableid=${data[0].id}`);
+                                                }
+                                            },
                                         });
                                     }} 
                                     className="flex pointer-events-auto items-center justify-center 

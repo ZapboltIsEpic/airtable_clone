@@ -1,10 +1,8 @@
-'use client';
-
-import { api } from "~/trpc/react";
 import Image from "next/image"
 import TableCreationWayFlexBox from "../tablecreationwayflexbox"
 import BaseListItem from "./baselistitem";
 import type { Base } from "@prisma/client";
+import { useGetAllBasesByUserIdQuery } from "~/app/services/base";
 
 interface Session {
     user: {
@@ -13,12 +11,7 @@ interface Session {
 }
 
 export default function HomeMainContent({ session }: { session: Session }) {
-    const { data: bases, isLoading, error } = api.base.get.useQuery(
-        { userId: session.user.id }, 
-        { enabled: !!session?.user?.id } 
-    );
-    console.log(bases);
-
+    const { data : bases, isLoading, error } = useGetAllBasesByUserIdQuery(session?.user?.id ?? "");
 
     return (
         <div className="bg-gray-100 overflow-auto w-full flex flex-col">
